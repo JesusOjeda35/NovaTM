@@ -38,7 +38,7 @@ class AuthController extends Controller
         if ($usuario && Hash::check($credentials['password'], $usuario->password_hash)) {
             Auth::login($usuario);
             $request->session()->regenerate();
-            return redirect()->intended('/dashboard')->with('status', '¡Bienvenido ' . $usuario->nombre_completo . '!');
+            return redirect('/')->with('status', '¡Bienvenido ' . $usuario->nombre_completo . '!');
         }
 
         return back()->withErrors([
@@ -116,7 +116,7 @@ class AuthController extends Controller
             Auth::login($usuario);
             $request->session()->regenerate();
             
-            return redirect('/dashboard')->with('status', '¡Bienvenido a NovaTM, ' . $usuario->nombre_completo . '!');
+            return redirect('/')->with('status', '¡Bienvenido a NovaTM, ' . $usuario->nombre_completo . '!');
         } catch (\Exception $e) {
             return back()
                 ->withErrors(['error' => 'Ocurrió un error al registrarse. Por favor intenta de nuevo.'])

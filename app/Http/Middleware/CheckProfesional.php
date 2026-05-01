@@ -11,10 +11,22 @@ class CheckProfesional
     /**
      * Handle an incoming request.
      *
-     * @param  Closure(Request): (Response)  $next
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     public function handle(Request $request, Closure $next): Response
     {
-        return $next($request);
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        $rol = auth()->user()->rol;
+
+        if ($rol === 'veterinario' || $rol === 'especialista') {
+            return $next($request);
+        }
+
+        return redirect()->back()->with('error', 'Solo profesionales pueden acceder aquí');
     }
 }

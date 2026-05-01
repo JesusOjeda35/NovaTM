@@ -8,6 +8,7 @@ use App\Http\Controllers\AnimalController;
 use App\Http\Controllers\ConsultaController;
 use App\Http\Controllers\RecetaController;
 use App\Http\Controllers\MensajeController;
+use App\Http\Controllers\PasswordResetController;
 
 // ========== RUTAS PÚBLICAS (sin autenticación) ==========
 Route::get('/', function () {
@@ -24,6 +25,12 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 
+// Recuperación de contraseña
+Route::get('/password/reset', [PasswordResetController::class, 'showEmailForm'])->name('password.request');
+Route::post('/password/email', [PasswordResetController::class, 'sendResetLink'])->name('password.email');
+Route::get('/password/reset/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+Route::post('/password/reset', [PasswordResetController::class, 'reset'])->name('password.update');
+
 // APIs públicas
 Route::get('/api/departamentos/{paisId}', [LocalidadController::class, 'getDepartamentos']);
 Route::get('/api/municipios/{departamentoId}', [LocalidadController::class, 'getMunicipios']);
@@ -36,7 +43,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     // ========== USUARIO NORMAL (Productor) ==========
-    Route::middleware('checkRole:productor')->group(function () {
+    Route::middleware('productor')->group(function () {
         // Animales
         Route::get('/mis-animales', [AnimalController::class, 'index'])->name('productor.animales');
         Route::get('/animales/crear', [AnimalController::class, 'create'])->name('animal.create');
@@ -60,7 +67,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // ========== VETERINARIO / ESPECIALISTA ==========
-    Route::middleware('checkRole:veterinario,especialista')->group(function () {
+    Route::middleware('profesional')->group(function () {
         // Pacientes
         Route::get('/mis-pacientes', [DashboardController::class, 'misPacientes'])->name('profesional.pacientes');
 
