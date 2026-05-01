@@ -4,41 +4,44 @@
 
             <!-- Left side: Logo -->
             <div class="flex items-center gap-3 min-w-[220px]">
-                <img src="{{ asset('images/logo.png') }}" alt="NovaTM" class="w-10 h-10 object-contain">
-                <span class="text-2xl font-bold tracking-tight" style="color: #14202A;">
-                    NovaTM
-                </span>
+                <img src="{{ asset('images/logoNovaTM.png') }}" alt="NovaTM" class="w-14 h-14 object-contain">
+                <div>
+                    <span class="text-2xl font-bold tracking-tight block" style="color: #14202A; line-height: 1.2;">
+                        NovaTM
+                    </span>
+                    <span class="text-xs text-gray-500" style="letter-spacing: 0.5px;">Telemedicina</span>
+                </div>
             </div>
 
             <!-- Center navigation -->
             <div class="hidden xl:flex items-center gap-6 text-sm font-semibold" style="color: #14202A;">
                 <a href="{{ url('/') }}" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
-                    Mi Ganado 🐄
+                    Mi Ganado <i class='fas fa-paw'></i>
                 </a>
                 <a href="#" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
-                    Consultas 🩺
+                    Consultas <i class="fa-solid fa-stethoscope"></i>
                 </a>
                 <a href="#" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
-                    Historial 📋
+                    Historial <i class='far fa-clipboard'></i>
                 </a>
                 <a href="#" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
-                    Recetas 💊
+                    Recetas <i class="fa-solid fa-pills"></i>
                 </a>
                 <a href="#" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
-                    Mensajes 💬
+                    Mensajes <i class='far fa-comment'></i>
                 </a>
                 <a href="#" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
-                    Perfil 👤
+                    Perfil <i class='fas fa-user-alt'></i>
                 </a>
-                <a href="#" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
-                    Ayuda ❓
+                <a href="#footer" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
+                    Ayuda <i class="fa-solid fa-question"></i>
                 </a>
             </div>
 
             <!-- Right side: Emergency (SIN MODIFICAR - ROJO) -->
             <div class="flex items-center gap-3">
                 <a href="#" class="bg-red-600 hover:bg-red-700 text-white text-sm font-bold px-5 py-3 rounded-md transition">
-                    🚨 Atención de emergencia
+                <i class="fa fa-ambulance" aria-hidden="true"></i> Atención de emergencia
                 </a>
             </div>
         </div>

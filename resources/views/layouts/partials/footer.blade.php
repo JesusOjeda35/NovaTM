@@ -1,10 +1,10 @@
-<footer class="w-full bg-[#14202A] text-white">
+<footer id="footer" class="w-full bg-[#14202A] text-white">
     <div class="max-w-screen-2xl mx-auto px-6 lg:px-12 py-14">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
             <!-- Brand -->
             <div class="lg:col-span-1">
                 <div class="flex items-center gap-3 mb-4">
-                    <img src="{{ asset('images/logo.png') }}" alt="NovaTM" class="w-10 h-10 object-contain">
+                    <img src="{{ asset('images/logoNovaTM.png') }}" alt="NovaTM" class="w-14 h-14 object-contain rounded-full">
                     <span class="text-xl font-bold text-white">NovaTM</span>
                 </div>
 
