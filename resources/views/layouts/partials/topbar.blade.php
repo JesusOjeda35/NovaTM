@@ -30,7 +30,7 @@
                 <a href="#" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
                     Mensajes <i class='far fa-comment'></i>
                 </a>
-                <a href="#" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
+                <a href="{{ route('login') }}" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
                     Perfil <i class='fas fa-user-alt'></i>
                 </a>
                 <a href="#footer" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">

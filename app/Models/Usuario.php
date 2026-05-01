@@ -4,9 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
-class Usuario extends Model
+class Usuario extends Authenticatable
 {
+    use Notifiable;
+
     protected $table = 'usuarios';
     protected $primaryKey = 'id';
     public $timestamps = false;
@@ -17,6 +22,9 @@ class Usuario extends Model
         'telefono',
         'email',
         'direccion',
+        'pais_id',
+        'departamento_id',
+        'municipio_id',
         'rol',
         'especialidad',
         'tarjeta_profesional',
@@ -26,10 +34,36 @@ class Usuario extends Model
         'password_hash',
     ];
 
+    protected $hidden = [
+        'password_hash',
+    ];
+
     protected $casts = [
         'timestamp_registro' => 'datetime',
     ];
 
+    public function getAuthPasswordName()
+    {
+        return 'password_hash';
+    }
+
+    // Relaciones de localidad
+    public function pais(): BelongsTo
+    {
+        return $this->belongsTo(Pais::class, 'pais_id');
+    }
+
+    public function departamento(): BelongsTo
+    {
+        return $this->belongsTo(Departamento::class, 'departamento_id');
+    }
+
+    public function municipio(): BelongsTo
+    {
+        return $this->belongsTo(Municipio::class, 'municipio_id');
+    }
+
+    // Relaciones existentes
     public function animales(): HasMany
     {
         return $this->hasMany(Animal::class, 'usuarios_id', 'id');
