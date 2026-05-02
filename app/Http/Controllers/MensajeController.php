@@ -11,7 +11,22 @@ class MensajeController extends Controller
 {
     public function index()
     {
-        $mensajes = Mensaje::with('emisor', 'receptor', 'consulta')->latest('id_mensaje')->paginate(10);
+        $usuario = auth()->user();
+
+        if ($usuario->rol === 'productor') {
+            // Mostrar solo mensajes del productor
+            $mensajes = Mensaje::where('usuarios_id', $usuario->id)
+                ->orWhere('usuarios_id2', $usuario->id)
+                ->with('emisor', 'receptor', 'consulta')
+                ->latest('id_mensaje')
+                ->paginate(10);
+        } else {
+            // Mostrar todos los mensajes para veterinario/especialista
+            $mensajes = Mensaje::with('emisor', 'receptor', 'consulta')
+                ->latest('id_mensaje')
+                ->paginate(10);
+        }
+
         return view('mensajes.index', compact('mensajes'));
     }
 
@@ -39,7 +54,7 @@ class MensajeController extends Controller
 
         Mensaje::create($data);
 
-        return redirect()->route('mensajes.index')->with('success', 'Mensaje creado correctamente.');
+        return redirect()->route('productor.mensajes')->with('success', 'Mensaje creado correctamente.');
     }
 
     public function show(Mensaje $mensaje)
@@ -72,13 +87,13 @@ class MensajeController extends Controller
 
         $mensaje->update($data);
 
-        return redirect()->route('mensajes.index')->with('success', 'Mensaje actualizado correctamente.');
+        return redirect()->route('productor.mensajes')->with('success', 'Mensaje actualizado correctamente.');
     }
 
     public function destroy(Mensaje $mensaje)
     {
         $mensaje->delete();
 
-        return redirect()->route('mensajes.index')->with('success', 'Mensaje eliminado correctamente.');
+        return redirect()->route('productor.mensajes')->with('success', 'Mensaje eliminado correctamente.');
     }
 }

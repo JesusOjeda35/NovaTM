@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\HistorialClinicoController;
 use App\Http\Controllers\LocalidadController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AnimalController;
@@ -42,10 +43,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+    // ========== RUTAS DEL MENÚ (disponibles para todos los roles autenticados) ==========
+    Route::get('/mis-animales', [AnimalController::class, 'index'])->name('productor.animales');
+    Route::get('/mis-consultas', [ConsultaController::class, 'misConsultas'])->name('productor.consultas');
+    Route::get('/mis-recetas', [RecetaController::class, 'misRecetas'])->name('productor.recetas');
+    Route::get('/mensajes', [MensajeController::class, 'index'])->name('productor.mensajes');
+
     // ========== USUARIO NORMAL (Productor) ==========
-    Route::middleware('productor')->group(function () {
+    Route::middleware(\App\Http\Middleware\CheckProductor::class)->group(function () {
         // Animales
-        Route::get('/mis-animales', [AnimalController::class, 'index'])->name('productor.animales');
         Route::get('/animales/crear', [AnimalController::class, 'create'])->name('animal.create');
         Route::post('/animales', [AnimalController::class, 'store'])->name('animal.store');
         Route::get('/animales/{animal}', [AnimalController::class, 'show'])->name('animal.show');
@@ -53,21 +59,18 @@ Route::middleware('auth')->group(function () {
         Route::put('/animales/{animal}', [AnimalController::class, 'update'])->name('animal.update');
 
         // Consultas (ver propias)
-        Route::get('/mis-consultas', [ConsultaController::class, 'misConsultas'])->name('productor.consultas');
         Route::get('/consultas/{consulta}', [ConsultaController::class, 'show'])->name('consulta.show');
 
         // Recetas (ver propias)
-        Route::get('/mis-recetas', [RecetaController::class, 'misRecetas'])->name('productor.recetas');
         Route::get('/recetas/{receta}', [RecetaController::class, 'show'])->name('receta.show');
 
         // Mensajes
-        Route::get('/mensajes', [MensajeController::class, 'index'])->name('productor.mensajes');
         Route::post('/mensajes', [MensajeController::class, 'store'])->name('mensaje.store');
         Route::get('/mensajes/{mensaje}', [MensajeController::class, 'show'])->name('mensaje.show');
     });
 
     // ========== VETERINARIO / ESPECIALISTA ==========
-    Route::middleware('profesional')->group(function () {
+    Route::middleware(\App\Http\Middleware\CheckProfesional::class)->group(function () {
         // Pacientes
         Route::get('/mis-pacientes', [DashboardController::class, 'misPacientes'])->name('profesional.pacientes');
 
@@ -79,6 +82,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/consultas/{consulta}', [ConsultaController::class, 'update'])->name('consulta.update');
 
         // Recetas (crear, editar)
+        Route::get('/recetas', [RecetaController::class, 'index'])->name('profesional.recetas');
         Route::get('/recetas/crear', [RecetaController::class, 'create'])->name('receta.create');
         Route::post('/recetas', [RecetaController::class, 'store'])->name('receta.store');
         Route::get('/recetas/{receta}/editar', [RecetaController::class, 'edit'])->name('receta.edit');
