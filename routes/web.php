@@ -57,6 +57,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/animales/{animal}', [AnimalController::class, 'show'])->name('animal.show');
         Route::get('/animales/{animal}/editar', [AnimalController::class, 'edit'])->name('animal.edit');
         Route::put('/animales/{animal}', [AnimalController::class, 'update'])->name('animal.update');
+        Route::delete('/animales/{animal}', [AnimalController::class, 'destroy'])->name('animal.destroy');
 
         // Consultas (ver propias)
         Route::get('/consultas/{consulta}', [ConsultaController::class, 'show'])->name('consulta.show');

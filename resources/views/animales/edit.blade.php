@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Nuevo Animal - Mi Ganado')
+@section('title', 'Editar Animal - Mi Ganado')
 
 @section('styles')
 <style>
@@ -269,13 +269,14 @@
 <div class="container-box">
     <div class="card-section">
         <h5 style="font-size: 24px; color: #14202A; margin: 0; font-weight: 700;">
-            <i class="fas fa-plus-circle" style="color: #facc15;"></i> Crear Nuevo Animal
+            <i class="fas fa-edit" style="color: #facc15;"></i> Editar Animal
         </h5>
-        <p style="color: #6b7280; margin-top: 8px; margin-bottom: 0;">Complete la información para registrar un nuevo animal</p>
+        <p style="color: #6b7280; margin-top: 8px; margin-bottom: 0;">Modifica la información del animal</p>
     </div>
 
-    <form method="POST" action="{{ route('animal.store') }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ route('animal.update', $animal->id_animal) }}" enctype="multipart/form-data">
         @csrf
+        @method('PUT')
 
         <!-- 1. Información básica -->
         <div class="card-section">
@@ -285,17 +286,17 @@
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label class="form-label">Usuario *</label>
-                    <input type="text" name="usuario_display" class="form-control" value="{{ auth()->user()->nombre_completo }}" readonly>
-                    <input type="hidden" name="usuarios_id" value="{{ auth()->user()->id }}">
+                    <input type="text" name="usuario_display" class="form-control" value="{{ $animal->usuario->nombre_completo }}" readonly>
+                    <input type="hidden" name="usuarios_id" value="{{ $animal->usuarios_id }}">
                 </div>
                 <div class="form-group col-md-6">
                     <label class="form-label">Nombre del Animal *</label>
-                    <input type="text" name="nombre" class="form-control" placeholder="Ej: Beto" required>
+                    <input type="text" name="nombre" class="form-control" value="{{ $animal->nombre }}" required>
                 </div>
             </div>
             <div class="form-group">
                 <label class="form-label">Identificación Propia</label>
-                <input type="text" name="identificacion_propia" class="form-control" placeholder="Ej: Arete #123 o Microchip">
+                <input type="text" name="identificacion_propia" class="form-control" value="{{ $animal->identificacion_propia }}">
             </div>
         </div>
 
@@ -307,21 +308,21 @@
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label class="form-label">Especie *</label>
-                    <input type="text" name="especie" class="form-control" placeholder="Ej: Bovino" required>
+                    <input type="text" name="especie" class="form-control" value="{{ $animal->especie }}" required>
                 </div>
                 <div class="form-group col-md-6">
                     <label class="form-label">Raza</label>
-                    <input type="text" name="raza" class="form-control" placeholder="Ej: Holstein">
+                    <input type="text" name="raza" class="form-control" value="{{ $animal->raza }}">
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label class="form-label">Edad</label>
-                    <input type="text" name="edad" class="form-control" placeholder="Ej: 2 años">
+                    <input type="text" name="edad" class="form-control" value="{{ $animal->edad }}">
                 </div>
                 <div class="form-group col-md-6">
                     <label class="form-label">Peso (kg)</label>
-                    <input type="number" name="peso" class="form-control" placeholder="Ej: 600">
+                    <input type="number" name="peso" class="form-control" value="{{ $animal->peso }}">
                 </div>
             </div>
         </div>
@@ -334,11 +335,11 @@
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label class="form-label">Estado de Salud</label>
-                    <input type="text" name="estado_salud" class="form-control" placeholder="Ej: Bueno">
+                    <input type="text" name="estado_salud" class="form-control" value="{{ $animal->estado_salud }}">
                 </div>
                 <div class="form-group col-md-6">
                     <label class="form-label">Fecha de Registro</label>
-                    <input type="date" name="fecha_registro" class="form-control" value="{{ date('Y-m-d') }}">
+                    <input type="date" name="fecha_registro" class="form-control" value="{{ $animal->fecha_registro?->format('Y-m-d') }}">
                 </div>
             </div>
         </div>
@@ -350,20 +351,24 @@
             </div>
             <div class="form-row">
                 <div class="form-group col-md-6">
-                    <label class="form-label">Foto (PNG o JPG) *</label>
+                    <label class="form-label">Foto (PNG o JPG)</label>
                     <div class="upload-box" id="uploadBox">
                         <i class="fas fa-cloud-arrow-up"></i>
                         <p>Arrastra tu imagen aquí o haz clic</p>
                         <small>PNG o JPG • Máx 5MB</small>
                     </div>
-                    <input type="file" id="foto_url" name="foto_url" accept="image/png,image/jpeg" required>
+                    <input type="file" id="foto_url" name="foto_url" accept="image/png,image/jpeg">
                     <div class="file-name" id="fileName"></div>
                 </div>
                 <div class="form-group col-md-6">
                     <label class="form-label">Vista Previa</label>
                     <div class="preview-box" id="previewBox">
                         <div class="preview-placeholder">
-                            <i class="fas fa-image" style="font-size: 40px;"></i>
+                            @if($animal->foto_url)
+                                <img src="{{ asset($animal->foto_url) }}" style="width: 100%; height: 100%; object-fit: cover;" alt="{{ $animal->nombre }}">
+                            @else
+                                <i class="fas fa-image" style="font-size: 40px;"></i>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -377,7 +382,7 @@
             </div>
             <div style="display: flex; align-items: center; gap: 12px;">
                 <label class="switch">
-                    <input type="checkbox" name="sincronizado" value="S">
+                    <input type="checkbox" name="sincronizado" value="S" @if($animal->sincronizado === 'S') checked @endif>
                     <span class="slider"></span>
                 </label>
                 <label class="form-label" style="margin-bottom: 0;">Sincronizar con plataforma</label>
@@ -390,7 +395,7 @@
                 <i class="fas fa-times"></i> Cancelar
             </a>
             <button type="submit" class="btn-save">
-                <i class="fas fa-check"></i> Crear Animal
+                <i class="fas fa-check"></i> Guardar Cambios
             </button>
         </div>
     </form>

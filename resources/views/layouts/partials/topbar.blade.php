@@ -4,13 +4,15 @@
 
             <!-- Left side: Logo + Usuario (si está autenticado) -->
             <div class="flex items-center gap-3 min-w-[220px]">
-                <img src="{{ asset('images/logoNovaTM.png') }}" alt="NovaTM" class="w-14 h-14 object-contain">
-                <div>
-                    <span class="text-2xl font-bold tracking-tight block" style="color: #14202A; line-height: 1.2;">
-                        NovaTM
-                    </span>
-                    <span class="text-xs text-gray-500" style="letter-spacing: 0.5px;">Telemedicina</span>
-                </div>
+                <a href="{{ route('home') }}" style="text-decoration: none; display: flex; align-items: center; gap: 12px; transition: opacity 0.3s ease;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                    <img src="{{ asset('images/logoNovaTM.png') }}" alt="NovaTM" class="w-14 h-14 object-contain">
+                    <div>
+                        <span class="text-2xl font-bold tracking-tight block" style="color: #14202A; line-height: 1.2;">
+                            NovaTM
+                        </span>
+                        <span class="text-xs text-gray-500" style="letter-spacing: 0.5px;">Telemedicina</span>
+                    </div>
+                </a>
                 
                 <!-- Nombre del usuario autenticado -->
                 @auth
@@ -44,7 +46,7 @@
                     <a href="#" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
                         Historial <i class='far fa-clipboard'></i>
                     </a>
-                    <a href="# class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
+                    <a href="#" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
                         Recetas <i class="fa-solid fa-pills"></i>
                     </a>
                     <a href="#" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">

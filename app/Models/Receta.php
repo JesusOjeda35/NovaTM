@@ -5,20 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class HistorialClinico extends Model
+class Receta extends Model
 {
-    protected $table = 'historiales_clinicos';
-    protected $primaryKey = 'id_historial';
+    protected $table = 'recetas';
+    protected $primaryKey = 'id_receta';
     public $timestamps = false;
 
     protected $fillable = [
         'usuarios_id',
         'animales_id_animal',
         'fecha',
-        'tipo_evento',
-        'descripcion',
-        'diagnostico',
-        'tratamiento',
+        'medicamento',
+        'dosis',
+        'duracion',
+        'indicaciones',
+        'notas',
         'archivos_adjuntos',
         'firma_digital',
         'sincronizado',
