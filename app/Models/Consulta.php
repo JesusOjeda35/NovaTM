@@ -11,9 +11,11 @@ class Consulta extends Model
     protected $table = 'consultas';
     protected $primaryKey = 'id_consulta';
     public $timestamps = false;
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     protected $fillable = [
-        'usuarios_id',
+        'Users_id',
         'animales_id_animal',
         'tipo_consulta',
         'estado',
@@ -33,9 +35,11 @@ class Consulta extends Model
         'fecha_atencion' => 'datetime',
     ];
 
-    public function usuario(): BelongsTo
+    // ==================== RELACIONES ====================
+
+    public function User(): BelongsTo
     {
-        return $this->belongsTo(Usuario::class, 'usuarios_id', 'id');
+        return $this->belongsTo(User::class, 'Users_id', 'id');
     }
 
     public function animal(): BelongsTo
@@ -45,11 +49,43 @@ class Consulta extends Model
 
     public function mensajes(): HasMany
     {
-        return $this->hasMany(Mensaje::class, 'consultas_id_consulta', 'id_consulta');
+        return $this->hasMany(Mensajes::class, 'consultas_id_consulta', 'id_consulta');
     }
 
     public function recetas(): HasMany
     {
         return $this->hasMany(Receta::class, 'consultas_id_consulta', 'id_consulta');
+    }
+
+    // ==================== MÉTODOS HELPER ====================
+
+    public function isPendiente(): bool
+    {
+        return $this->estado === 'pendiente';
+    }
+
+    public function isAtendida(): bool
+    {
+        return $this->estado === 'atendida';
+    }
+
+    public function isCancelada(): bool
+    {
+        return $this->estado === 'cancelada';
+    }
+
+    public function isUrgente(): bool
+    {
+        return $this->urgencia === 'alta';
+    }
+
+    public function requierePresencial(): bool
+    {
+        return $this->requiere_presencial === 'S';
+    }
+
+    public function isSincronizada(): bool
+    {
+        return $this->sincronizado === 'S';
     }
 }

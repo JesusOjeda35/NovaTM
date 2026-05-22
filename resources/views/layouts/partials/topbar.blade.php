@@ -2,7 +2,7 @@
     <div class="w-full px-4 lg:px-8">
         <div class="flex items-center justify-between py-4">
 
-            <!-- Left side: Logo + Usuario (si está autenticado) -->
+            <!-- Left side: Logo + User (si está autenticado) -->
             <div class="flex items-center gap-3 min-w-[220px]">
                 <a href="{{ route('home') }}" style="text-decoration: none; display: flex; align-items: center; gap: 12px; transition: opacity 0.3s ease;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
                     <img src="{{ asset('images/logoNovaTM.png') }}" alt="NovaTM" class="w-14 h-14 object-contain">
@@ -14,7 +14,7 @@
                     </div>
                 </a>
                 
-                <!-- Nombre del usuario autenticado -->
+                <!-- Nombre del User autenticado -->
                 @auth
                     <div class="ml-6 pl-6 border-l-2 border-gray-300">
                         <span class="text-sm font-semibold" style="color: #14202A;">
@@ -37,24 +37,44 @@
             <!-- Center navigation -->
             <div class="hidden xl:flex items-center gap-6 text-sm font-semibold" style="color: #14202A;">
                 @auth
-                    <a href="{{ route('animal.create') }}" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
+                    <a href="{{ route('productor.animales') }}" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
                         Mi Ganado <i class='fas fa-paw'></i>
                     </a>
-                    <a href="#" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
-                        Consultas <i class="fa-solid fa-stethoscope"></i>
-                    </a>
-                    <a href="#" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
+
+                    @if(auth()->user()->isProfesional())
+                        <!-- Para veterinarios y especialistas -->
+                        <a href="{{ route('profesional.consultas') }}" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
+                            Consultas <i class="fa-solid fa-stethoscope"></i>
+                        </a>
+                    @else
+                        <!-- Para productores -->
+                        <a href="{{ route('profesionales.buscar') }}" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
+                            Consultas <i class="fa-solid fa-stethoscope"></i>
+                        </a>
+                    @endif
+
+                    <a href="{{ route('profesional.historiales') }}" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
                         Historial <i class='far fa-clipboard'></i>
                     </a>
-                    <a href="#" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
-                        Recetas <i class="fa-solid fa-pills"></i>
-                    </a>
-                    <a href="#" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
+
+                    @if(auth()->user()->isProfesional())
+                        <a href="{{ route('profesional.recetas') }}" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
+                            Recetas <i class="fa-solid fa-pills"></i>
+                        </a>
+                    @else
+                        <a href="{{ route('productor.recetas') }}" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
+                            Recetas <i class="fa-solid fa-pills"></i>
+                        </a>
+                    @endif
+
+                    <a href="{{ route('productor.mensajes') }}" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
                         Mensajes <i class='far fa-comment'></i>
                     </a>
-                    <a href="#" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
+
+                    <a href="{{ route('dashboard') }}" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
                         Perfil <i class='fas fa-user-alt'></i>
                     </a>
+
                     <a href="#footer" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
                         Ayuda <i class="fa-solid fa-question"></i>
                     </a>

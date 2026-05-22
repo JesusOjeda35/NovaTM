@@ -5,14 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Notificacion extends Model
+class Notificaciones extends Model
 {
     protected $table = 'notificaciones';
     protected $primaryKey = 'id_notificacion';
     public $timestamps = false;
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     protected $fillable = [
-        'usuarios_id',
+        'Users_id',
         'tipo',
         'contenido',
         'leido',
@@ -24,8 +26,27 @@ class Notificacion extends Model
         'fecha_creacion' => 'datetime',
     ];
 
-    public function usuario(): BelongsTo
+    // ==================== RELACIONES ====================
+
+    public function User(): BelongsTo
     {
-        return $this->belongsTo(Usuario::class, 'usuarios_id', 'id');
+        return $this->belongsTo(User::class, 'Users_id', 'id');
+    }
+
+    // ==================== MÉTODOS HELPER ====================
+
+    public function isLeida(): bool
+    {
+        return $this->leido === 'S';
+    }
+
+    public function isSincronizada(): bool
+    {
+        return $this->sincronizado === 'S';
+    }
+
+    public function marcarComoLeida(): void
+    {
+        $this->update(['leido' => 'S']);
     }
 }

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Usuario;
+use App\Models\User;
 use App\Models\Pais;
 use Illuminate\Support\Facades\Hash;
 
@@ -33,11 +33,13 @@ class AuthController extends Controller
             'password.min' => 'La contraseña debe tener al menos 6 caracteres',
         ]);
 
-        $usuario = Usuario::where('email', $credentials['email'])->first();
+        $usuario = User::where('email', $credentials['email'])->first();
 
         if ($usuario && Hash::check($credentials['password'], $usuario->password_hash)) {
             Auth::login($usuario);
             $request->session()->regenerate();
+            
+            // Redirigir a la página de inicio
             return redirect('/')->with('status', '¡Bienvenido ' . $usuario->nombre_completo . '!');
         }
 
@@ -61,27 +63,31 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validated = $request->validate([
-            'nombre_completo' => 'required|string|max:255',
-            'email' => 'required|email|unique:usuarios,email',
-            'telefono' => 'required|string|max:20',
-            'documento' => 'required|string|unique:usuarios,documento|max:20',
-            'direccion' => 'required|string|max:255',
+            'nombre_completo' => 'required|string|max:100',
+            'email' => 'required|email|unique:users,email',
+            'telefono' => 'required|string|max:15',
+            'documento' => 'required|string|unique:users,documento|max:20',
+            'direccion' => 'required|string|max:150',
             'pais_id' => 'required|exists:paises,id',
             'departamento_id' => 'required|exists:departamentos,id',
             'municipio_id' => 'required|exists:municipios,id',
             'rol' => 'required|in:productor,veterinario,especialista',
-            'especialidad' => 'nullable|string|max:255',
-            'tarjeta_profesional' => 'nullable|string|max:20',
+            'especialidad' => 'nullable|string|max:50',
+            'tarjeta_profesional' => 'nullable|string|max:30',
             'password' => 'required|min:6|confirmed',
         ], [
             'nombre_completo.required' => 'El nombre completo es requerido',
+            'nombre_completo.max' => 'El nombre completo no puede exceder 100 caracteres',
             'email.required' => 'El email es requerido',
             'email.email' => 'El email no es válido',
             'email.unique' => 'Este email ya está registrado',
             'telefono.required' => 'El teléfono es requerido',
+            'telefono.max' => 'El teléfono no puede exceder 15 caracteres',
             'documento.required' => 'El documento es requerido',
             'documento.unique' => 'Este documento ya está registrado',
+            'documento.max' => 'El documento no puede exceder 20 caracteres',
             'direccion.required' => 'La dirección es requerida',
+            'direccion.max' => 'La dirección no puede exceder 150 caracteres',
             'pais_id.required' => 'El país es requerido',
             'pais_id.exists' => 'El país seleccionado no es válido',
             'departamento_id.required' => 'El departamento es requerido',
@@ -90,13 +96,15 @@ class AuthController extends Controller
             'municipio_id.exists' => 'El municipio seleccionado no es válido',
             'rol.required' => 'El rol es requerido',
             'rol.in' => 'El rol seleccionado no es válido',
+            'especialidad.max' => 'La especialidad no puede exceder 50 caracteres',
+            'tarjeta_profesional.max' => 'La tarjeta profesional no puede exceder 30 caracteres',
             'password.required' => 'La contraseña es requerida',
             'password.min' => 'La contraseña debe tener al menos 6 caracteres',
             'password.confirmed' => 'Las contraseñas no coinciden',
         ]);
 
         try {
-            $usuario = Usuario::create([
+            $usuario = User::create([
                 'nombre_completo' => $validated['nombre_completo'],
                 'email' => $validated['email'],
                 'telefono' => $validated['telefono'],
@@ -110,12 +118,12 @@ class AuthController extends Controller
                 'tarjeta_profesional' => $validated['tarjeta_profesional'] ?? null,
                 'password_hash' => Hash::make($validated['password']),
                 'estado' => 'A',
-                'timestamp_registro' => now(),
             ]);
 
             Auth::login($usuario);
             $request->session()->regenerate();
             
+            // Redirigir a la página de inicio después del registro
             return redirect('/')->with('status', '¡Bienvenido a NovaTM, ' . $usuario->nombre_completo . '!');
         } catch (\Exception $e) {
             return back()

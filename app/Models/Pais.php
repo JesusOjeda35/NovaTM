@@ -8,15 +8,22 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Pais extends Model
 {
     protected $table = 'paises';
-    protected $fillable = ['nombre', 'codigo'];
+    public $timestamps = true;
+
+    protected $fillable = [
+        'nombre',
+        'codigo',
+    ];
+
+    // ==================== RELACIONES ====================
 
     public function departamentos(): HasMany
     {
-        return $this->hasMany(Departamento::class, 'pais_id');
+        return $this->hasMany(Departamento::class, 'pais_id', 'id');
     }
 
-    public function usuarios(): HasMany
+    public function Users(): HasMany
     {
-        return $this->hasMany(Usuario::class, 'pais_id');
+        return $this->hasMany(User::class, 'pais_id', 'id');
     }
 }

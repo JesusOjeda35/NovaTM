@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Mensaje;
-use App\Models\Usuario;
+use App\Models\Mensajes;
+use App\Models\User;
 use App\Models\Consulta;
 use Illuminate\Http\Request;
 
@@ -11,18 +11,18 @@ class MensajeController extends Controller
 {
     public function index()
     {
-        $usuario = auth()->user();
+        $User = auth()->user();
 
-        if ($usuario->rol === 'productor') {
+        if ($User->rol === 'productor') {
             // Mostrar solo mensajes del productor
-            $mensajes = Mensaje::where('usuarios_id', $usuario->id)
-                ->orWhere('usuarios_id2', $usuario->id)
+            $mensajes = Mensajes::where('Users_id', $User->id)
+                ->orWhere('Users_id2', $User->id)
                 ->with('emisor', 'receptor', 'consulta')
                 ->latest('id_mensaje')
                 ->paginate(10);
         } else {
             // Mostrar todos los mensajes para veterinario/especialista
-            $mensajes = Mensaje::with('emisor', 'receptor', 'consulta')
+            $mensajes = Mensajes::with('emisor', 'receptor', 'consulta')
                 ->latest('id_mensaje')
                 ->paginate(10);
         }
@@ -32,57 +32,65 @@ class MensajeController extends Controller
 
     public function create()
     {
-        $usuarios = Usuario::orderBy('nombre_completo')->get();
         $consultas = Consulta::orderBy('id_consulta')->get();
-
-        return view('mensajes.create', compact('usuarios', 'consultas'));
+        return view('mensajes.create', compact('consultas'));
     }
 
     public function store(Request $request)
     {
+        $User = auth()->user();
+
         $data = $request->validate([
-            'usuarios_id' => 'required|exists:usuarios,id',
-            'usuarios_id2' => 'required|exists:usuarios,id',
             'consultas_id_consulta' => 'required|exists:consultas,id_consulta',
+            'Users_id2' => 'required|exists:Users,id',
             'contenido' => 'required|string|max:2000',
             'tipo_contenido' => 'nullable|string|max:20',
             'url_adjunto' => 'nullable|string|max:200',
-            'fecha_envio' => 'nullable|date',
-            'leido' => 'nullable|string|size:1',
-            'sincronizado' => 'nullable|string|size:1',
         ]);
 
-        Mensaje::create($data);
+        $data['Users_id'] = $User->id;
+        $data['fecha_envio'] = now();
+        $data['leido'] = 'N';
+        $data['sincronizado'] = 'N';
 
-        return redirect()->route('productor.mensajes')->with('success', 'Mensaje creado correctamente.');
+        Mensajes::create($data);
+
+        return redirect()->route('productor.mensajes')->with('success', 'Mensaje enviado correctamente.');
     }
 
-    public function show(Mensaje $mensaje)
+    public function show(Mensajes $mensaje)
     {
         $mensaje->load('emisor', 'receptor', 'consulta');
+        
+        // Marcar como leído
+        if ($mensaje->Users_id2 === auth()->user()->id && $mensaje->leido === 'N') {
+            $mensaje->update(['leido' => 'S']);
+        }
+
         return view('mensajes.show', compact('mensaje'));
     }
 
-    public function edit(Mensaje $mensaje)
+    public function edit(Mensajes $mensaje)
     {
-        $usuarios = Usuario::orderBy('nombre_completo')->get();
-        $consultas = Consulta::orderBy('id_consulta')->get();
+        // Solo el emisor puede editar
+        if ($mensaje->Users_id !== auth()->user()->id) {
+            abort(403, 'No autorizado.');
+        }
 
-        return view('mensajes.edit', compact('mensaje', 'usuarios', 'consultas'));
+        return view('mensajes.edit', compact('mensaje'));
     }
 
-    public function update(Request $request, Mensaje $mensaje)
+    public function update(Request $request, Mensajes $mensaje)
     {
+        // Solo el emisor puede actualizar
+        if ($mensaje->Users_id !== auth()->user()->id) {
+            abort(403, 'No autorizado.');
+        }
+
         $data = $request->validate([
-            'usuarios_id' => 'required|exists:usuarios,id',
-            'usuarios_id2' => 'required|exists:usuarios,id',
-            'consultas_id_consulta' => 'required|exists:consultas,id_consulta',
             'contenido' => 'required|string|max:2000',
             'tipo_contenido' => 'nullable|string|max:20',
             'url_adjunto' => 'nullable|string|max:200',
-            'fecha_envio' => 'nullable|date',
-            'leido' => 'nullable|string|size:1',
-            'sincronizado' => 'nullable|string|size:1',
         ]);
 
         $mensaje->update($data);
@@ -90,8 +98,13 @@ class MensajeController extends Controller
         return redirect()->route('productor.mensajes')->with('success', 'Mensaje actualizado correctamente.');
     }
 
-    public function destroy(Mensaje $mensaje)
+    public function destroy(Mensajes $mensaje)
     {
+        // Solo el emisor puede eliminar
+        if ($mensaje->Users_id !== auth()->user()->id) {
+            abort(403, 'No autorizado.');
+        }
+
         $mensaje->delete();
 
         return redirect()->route('productor.mensajes')->with('success', 'Mensaje eliminado correctamente.');

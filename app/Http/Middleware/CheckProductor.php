@@ -18,15 +18,13 @@ class CheckProductor
     public function handle(Request $request, Closure $next): Response
     {
         if (!auth()->check()) {
-            return redirect()->route('login');
+            return redirect()->route('login')->with('error', 'Debes iniciar sesión');
         }
 
-        $rol = auth()->user()->rol;
-
-        if ($rol === 'productor') {
+        if (auth()->user()->isProductor()) {
             return $next($request);
         }
 
-        return redirect()->back()->with('error', 'Solo productores pueden acceder aquí');
+        return redirect()->route('dashboard')->with('error', 'Solo productores pueden acceder aquí');
     }
 }

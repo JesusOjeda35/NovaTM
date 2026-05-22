@@ -10,9 +10,11 @@ class HistorialClinico extends Model
     protected $table = 'historiales_clinicos';
     protected $primaryKey = 'id_historial';
     public $timestamps = false;
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     protected $fillable = [
-        'usuarios_id',
+        'Users_id',
         'animales_id_animal',
         'fecha',
         'tipo_evento',
@@ -28,13 +30,32 @@ class HistorialClinico extends Model
         'fecha' => 'datetime',
     ];
 
-    public function usuario(): BelongsTo
+    // ==================== RELACIONES ====================
+
+    public function User(): BelongsTo
     {
-        return $this->belongsTo(Usuario::class, 'usuarios_id', 'id');
+        return $this->belongsTo(User::class, 'Users_id', 'id');
     }
 
     public function animal(): BelongsTo
     {
         return $this->belongsTo(Animal::class, 'animales_id_animal', 'id_animal');
+    }
+
+    // ==================== MÉTODOS HELPER ====================
+
+    public function isSincronizado(): bool
+    {
+        return $this->sincronizado === 'S';
+    }
+
+    public function tieneAdjuntos(): bool
+    {
+        return !empty($this->archivos_adjuntos);
+    }
+
+    public function tieneSignatura(): bool
+    {
+        return !empty($this->firma_digital);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Usuario;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -23,20 +23,20 @@ class PasswordResetController extends Controller
      */
     public function sendResetLink(Request $request)
     {
-        $request->validate(['email' => 'required|email|exists:usuarios,email']);
+        $request->validate(['email' => 'required|email|exists:Users,email']);
 
-        $usuario = Usuario::where('email', $request->email)->first();
+        $User = User::where('email', $request->email)->first();
         
-        if (!$usuario) {
+        if (!$User) {
             return back()->withErrors(['email' => 'No encontramos una cuenta con ese email']);
         }
 
         // Generar token temporal (válido por 1 hora)
         $token = Str::random(60);
-        Cache::put('password_reset_' . $token, $usuario->id, now()->addHour());
+        Cache::put('password_reset_' . $token, $User->id, now()->addHour());
 
         // Generar el enlace de recuperación
-        $resetLink = route('password.reset', ['token' => $token, 'email' => $usuario->email]);
+        $resetLink = route('password.reset', ['token' => $token, 'email' => $User->email]);
 
         return back()->with('status', $resetLink);
     }
@@ -47,9 +47,9 @@ class PasswordResetController extends Controller
     public function showResetForm(Request $request, $token = null)
     {
         // Verificar que el token sea válido
-        $usuarioId = Cache::get('password_reset_' . $token);
+        $UserId = Cache::get('password_reset_' . $token);
 
-        if (!$usuarioId) {
+        if (!$UserId) {
             return redirect('/password/reset')->withErrors(['token' => 'El enlace ha expirado. Por favor solicita uno nuevo.']);
         }
 
@@ -66,25 +66,25 @@ class PasswordResetController extends Controller
     {
         $request->validate([
             'token' => 'required',
-            'email' => 'required|email|exists:usuarios,email',
+            'email' => 'required|email|exists:Users,email',
             'password' => 'required|min:8|confirmed',
         ]);
 
         // Verificar que el token sea válido
-        $usuarioId = Cache::get('password_reset_' . $request->token);
+        $UserId = Cache::get('password_reset_' . $request->token);
 
-        if (!$usuarioId) {
+        if (!$UserId) {
             return back()->withErrors(['token' => 'El enlace de recuperación es inválido o ha expirado']);
         }
 
-        $usuario = Usuario::find($usuarioId);
+        $User = User::find($UserId);
 
-        if ($usuario->email !== $request->email) {
+        if ($User->email !== $request->email) {
             return back()->withErrors(['email' => 'El email no coincide']);
         }
 
         // Actualizar contraseña
-        $usuario->update([
+        $User->update([
             'password_hash' => Hash::make($request->password)
         ]);
 

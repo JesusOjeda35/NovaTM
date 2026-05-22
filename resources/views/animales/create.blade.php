@@ -284,9 +284,9 @@
             </div>
             <div class="form-row">
                 <div class="form-group col-md-6">
-                    <label class="form-label">Usuario *</label>
-                    <input type="text" name="usuario_display" class="form-control" value="{{ auth()->user()->nombre_completo }}" readonly>
-                    <input type="hidden" name="usuarios_id" value="{{ auth()->user()->id }}">
+                    <label class="form-label">User *</label>
+                    <input type="text" name="User_display" class="form-control" value="{{ auth()->user()->nombre_completo }}" readonly>
+                    <input type="hidden" name="Users_id" value="{{ auth()->user()->id }}">
                 </div>
                 <div class="form-group col-md-6">
                     <label class="form-label">Nombre del Animal *</label>

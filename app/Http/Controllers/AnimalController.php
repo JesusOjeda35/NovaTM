@@ -3,14 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Animal;
-use App\Models\Usuario;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class AnimalController extends Controller
 {
     public function index()
     {
-        $animales = Animal::with('usuario')->where('usuarios_id', auth()->user()->id)->latest('id_animal')->paginate(10);
+        $animales = Animal::with('user')->where('user_id', auth()->user()->id)->latest('id_animal')->paginate(10);
         return view('animales.index', compact('animales'));
     }
 
@@ -22,7 +22,6 @@ class AnimalController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'usuarios_id' => 'required|exists:usuarios,id',
             'nombre' => 'required|string|max:50',
             'identificacion_propia' => 'nullable|string|max:30',
             'especie' => 'required|string|max:30',
@@ -34,6 +33,9 @@ class AnimalController extends Controller
             'fecha_registro' => 'nullable|date',
             'sincronizado' => 'nullable|string|size:1',
         ]);
+
+        // Agregar el user_id automáticamente
+        $data['user_id'] = auth()->user()->id;
 
         // Guardar la foto si existe
         if ($request->hasFile('foto_url')) {
@@ -50,35 +52,33 @@ class AnimalController extends Controller
 
     public function show(Animal $animal)
     {
-        // Verificar que el animal pertenece al usuario autenticado
-        if ($animal->usuarios_id !== auth()->user()->id) {
+        // Verificar que el animal pertenece al User autenticado
+        if ($animal->user_id !== auth()->user()->id) {
             abort(403, 'No autorizado para ver este animal.');
         }
 
-        $animal->load('usuario', 'consultas', 'historialesClinicos', 'recetas');
+        $animal->load('user', 'consultas', 'historialesClinicos', 'recetas');
         return view('animales.success', compact('animal'));
     }
 
     public function edit(Animal $animal)
     {
-        // Verificar que el animal pertenece al usuario autenticado
-        if ($animal->usuarios_id !== auth()->user()->id) {
+        // Verificar que el animal pertenece al User autenticado
+        if ($animal->user_id !== auth()->user()->id) {
             abort(403, 'No autorizado para editar este animal.');
         }
 
-        $usuarios = Usuario::orderBy('nombre_completo')->get();
-        return view('animales.edit', compact('animal', 'usuarios'));
+        return view('animales.edit', compact('animal'));
     }
 
     public function update(Request $request, Animal $animal)
     {
-        // Verificar que el animal pertenece al usuario autenticado
-        if ($animal->usuarios_id !== auth()->user()->id) {
+        // Verificar que el animal pertenece al User autenticado
+        if ($animal->user_id !== auth()->user()->id) {
             abort(403, 'No autorizado para actualizar este animal.');
         }
 
         $data = $request->validate([
-            'usuarios_id' => 'required|exists:usuarios,id',
             'nombre' => 'required|string|max:50',
             'identificacion_propia' => 'nullable|string|max:30',
             'especie' => 'required|string|max:30',
@@ -111,8 +111,8 @@ class AnimalController extends Controller
 
     public function destroy(Animal $animal)
     {
-        // Verificar que el animal pertenece al usuario autenticado
-        if ($animal->usuarios_id !== auth()->user()->id) {
+        // Verificar que el animal pertenece al User autenticado
+        if ($animal->user_id !== auth()->user()->id) {
             abort(403, 'No autorizado para eliminar este animal.');
         }
 

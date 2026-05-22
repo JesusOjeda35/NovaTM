@@ -18,15 +18,13 @@ class CheckProfesional
     public function handle(Request $request, Closure $next): Response
     {
         if (!auth()->check()) {
-            return redirect()->route('login');
+            return redirect()->route('login')->with('error', 'Debes iniciar sesión');
         }
 
-        $rol = auth()->user()->rol;
-
-        if ($rol === 'veterinario' || $rol === 'especialista') {
+        if (auth()->user()->isProfesional()) {
             return $next($request);
         }
 
-        return redirect()->back()->with('error', 'Solo profesionales pueden acceder aquí');
+        return redirect()->route('dashboard')->with('error', 'Solo profesionales (veterinarios o especialistas) pueden acceder aquí');
     }
 }

@@ -7,10 +7,13 @@ use App\Models\Animal;
 
 class DashboardController extends Controller
 {
+    /**
+     * Redirigir al dashboard según el rol
+     */
     public function index()
     {
-        $usuario = auth()->user();
-        $rol = $usuario->rol;
+        $User = auth()->user();
+        $rol = $User->rol;
 
         if ($rol === 'productor') {
             return redirect()->route('productor.animales');
@@ -21,16 +24,23 @@ class DashboardController extends Controller
         return redirect()->route('login');
     }
 
-    // PRODUCTOR - Ver sus animales
-    public function misAnimales()
-    {
-        $animales = Animal::where('usuarios_id', auth()->id())->get();
-        return view('productor.animales', compact('animales'));
-    }
-
-    // PROFESIONAL - Ver sus pacientes
+    /**
+     * Ver los pacientes (animales) del profesional
+     */
     public function misPacientes()
     {
-        return view('profesional.pacientes');
+        $User = auth()->user();
+        
+        // Solo profesionales ven pacientes
+        if (!$User->isProfesional()) {
+            abort(403, 'No autorizado.');
+        }
+
+        // Obtener todos los animales (pacientes del profesional)
+        $animales = Animal::with('User', 'consultas')
+            ->latest('id_animal')
+            ->paginate(10);
+
+        return view('profesional.pacientes', compact('animales'));
     }
 }

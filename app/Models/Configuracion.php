@@ -10,9 +10,11 @@ class Configuracion extends Model
     protected $table = 'configuracion';
     protected $primaryKey = 'id_config';
     public $timestamps = false;
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     protected $fillable = [
-        'usuarios_id',
+        'Users_id',
         'clave',
         'valor',
         'actualizado',
@@ -22,8 +24,29 @@ class Configuracion extends Model
         'actualizado' => 'datetime',
     ];
 
-    public function usuario(): BelongsTo
+    // ==================== RELACIONES ====================
+
+    public function User(): BelongsTo
     {
-        return $this->belongsTo(Usuario::class, 'usuarios_id', 'id');
+        return $this->belongsTo(User::class, 'Users_id', 'id');
+    }
+
+    // ==================== MÉTODOS HELPER ====================
+
+    public static function obtener(int $UserId, string $clave, $default = null)
+    {
+        $config = self::where('Users_id', $UserId)
+            ->where('clave', $clave)
+            ->first();
+
+        return $config ? $config->valor : $default;
+    }
+
+    public static function guardar(int $UserId, string $clave, $valor): self
+    {
+        return self::updateOrCreate(
+            ['Users_id' => $UserId, 'clave' => $clave],
+            ['valor' => $valor, 'actualizado' => now()]
+        );
     }
 }

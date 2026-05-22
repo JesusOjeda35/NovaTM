@@ -368,7 +368,7 @@
 
             <!-- Rol -->
             <div class="form-group">
-                <label for="rol">Tipo de Usuario *</label>
+                <label for="rol">Tipo de User *</label>
                 <select 
                     class="form-select @error('rol') error-field @enderror" 
                     id="rol" 
@@ -378,7 +378,7 @@
                 >
                     <option value="">Selecciona tu rol</option>
                     <option value="productor" {{ old('rol') == 'productor' ? 'selected' : '' }}>
-                        👨‍🌾 Usuario Normal (Productor)
+                        👨‍🌾 User Normal (Productor)
                     </option>
                     <option value="veterinario" {{ old('rol') == 'veterinario' ? 'selected' : '' }}>
                         🩺 Veterinario

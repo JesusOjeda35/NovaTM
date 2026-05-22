@@ -11,9 +11,11 @@ class Animal extends Model
     protected $table = 'animales';
     protected $primaryKey = 'id_animal';
     public $timestamps = false;
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     protected $fillable = [
-        'usuarios_id',
+        'user_id',
         'nombre',
         'identificacion_propia',
         'especie',
@@ -30,9 +32,11 @@ class Animal extends Model
         'fecha_registro' => 'date',
     ];
 
-    public function usuario(): BelongsTo
+    // ==================== RELACIONES ====================
+
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Usuario::class, 'usuarios_id', 'id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     public function consultas(): HasMany
@@ -52,6 +56,18 @@ class Animal extends Model
 
     public function emergencias(): HasMany
     {
-        return $this->hasMany(Emergencia::class, 'animales_id_animal', 'id_animal');
+        return $this->hasMany(Emergencias::class, 'animales_id_animal', 'id_animal');
+    }
+
+    // ==================== MÉTODOS HELPER ====================
+
+    public function isSincronizado(): bool
+    {
+        return $this->sincronizado === 'S';
+    }
+
+    public function getEstadoAttribute()
+    {
+        return $this->estado_salud ?? 'Sin especificar';
     }
 }

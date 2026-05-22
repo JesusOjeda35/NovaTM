@@ -285,9 +285,9 @@
             </div>
             <div class="form-row">
                 <div class="form-group col-md-6">
-                    <label class="form-label">Usuario *</label>
-                    <input type="text" name="usuario_display" class="form-control" value="{{ $animal->usuario->nombre_completo }}" readonly>
-                    <input type="hidden" name="usuarios_id" value="{{ $animal->usuarios_id }}">
+                    <label class="form-label">User *</label>
+                    <input type="text" name="User_display" class="form-control" value="{{ $animal->User->nombre_completo }}" readonly>
+                    <input type="hidden" name="Users_id" value="{{ $animal->Users_id }}">
                 </div>
                 <div class="form-group col-md-6">
                     <label class="form-label">Nombre del Animal *</label>

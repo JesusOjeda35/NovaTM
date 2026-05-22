@@ -9,15 +9,22 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Municipio extends Model
 {
     protected $table = 'municipios';
-    protected $fillable = ['departamento_id', 'nombre'];
+    public $timestamps = true;
+
+    protected $fillable = [
+        'departamento_id',
+        'nombre',
+    ];
+
+    // ==================== RELACIONES ====================
 
     public function departamento(): BelongsTo
     {
-        return $this->belongsTo(Departamento::class, 'departamento_id');
+        return $this->belongsTo(Departamento::class, 'departamento_id', 'id');
     }
 
-    public function usuarios(): HasMany
+    public function Users(): HasMany
     {
-        return $this->hasMany(Usuario::class, 'municipio_id');
+        return $this->hasMany(User::class, 'municipio_id', 'id');
     }
 }

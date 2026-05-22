@@ -3,27 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\Models\Configuracion;
-use App\Models\Usuario;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class ConfiguracionController extends Controller
 {
     public function index()
     {
-        $configuraciones = Configuracion::with('usuario')->latest('id_config')->paginate(10);
+        $configuraciones = Configuracion::with('User')->latest('id_config')->paginate(10);
         return view('configuracion.index', compact('configuraciones'));
     }
 
     public function create()
     {
-        $usuarios = Usuario::orderBy('nombre_completo')->get();
-        return view('configuracion.create', compact('usuarios'));
+        $Users = User::orderBy('nombre_completo')->get();
+        return view('configuracion.create', compact('Users'));
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'usuarios_id' => 'required|exists:usuarios,id',
+            'Users_id' => 'required|exists:Users,id',
             'clave' => 'required|string|max:50',
             'valor' => 'nullable|string|max:200',
             'actualizado' => 'nullable|date',
@@ -36,20 +36,20 @@ class ConfiguracionController extends Controller
 
     public function show(Configuracion $configuracion)
     {
-        $configuracion->load('usuario');
+        $configuracion->load('User');
         return view('configuracion.show', compact('configuracion'));
     }
 
     public function edit(Configuracion $configuracion)
     {
-        $usuarios = Usuario::orderBy('nombre_completo')->get();
-        return view('configuracion.edit', compact('configuracion', 'usuarios'));
+        $Users = User::orderBy('nombre_completo')->get();
+        return view('configuracion.edit', compact('configuracion', 'Users'));
     }
 
     public function update(Request $request, Configuracion $configuracion)
     {
         $data = $request->validate([
-            'usuarios_id' => 'required|exists:usuarios,id',
+            'Users_id' => 'required|exists:Users,id',
             'clave' => 'required|string|max:50',
             'valor' => 'nullable|string|max:200',
             'actualizado' => 'nullable|date',
