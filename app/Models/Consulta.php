@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Consulta extends Model
 {
@@ -15,7 +16,8 @@ class Consulta extends Model
     protected $keyType = 'int';
 
     protected $fillable = [
-        'Users_id',
+        'user_id',
+        'disponibilidad_id',
         'animales_id_animal',
         'tipo_consulta',
         'estado',
@@ -28,6 +30,7 @@ class Consulta extends Model
         'requiere_presencial',
         'id_consulta_referencia',
         'sincronizado',
+        'historial_id',
     ];
 
     protected $casts = [
@@ -39,12 +42,17 @@ class Consulta extends Model
 
     public function User(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'Users_id', 'id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     public function animal(): BelongsTo
     {
         return $this->belongsTo(Animal::class, 'animales_id_animal', 'id_animal');
+    }
+
+    public function disponibilidad(): BelongsTo
+    {
+        return $this->belongsTo(Disponibilidad::class, 'disponibilidad_id', 'id');
     }
 
     public function mensajes(): HasMany
@@ -55,6 +63,11 @@ class Consulta extends Model
     public function recetas(): HasMany
     {
         return $this->hasMany(Receta::class, 'consultas_id_consulta', 'id_consulta');
+    }
+
+    public function historial(): BelongsTo
+    {
+        return $this->belongsTo(HistorialClinico::class, 'historial_id', 'id_historial');
     }
 
     // ==================== MÉTODOS HELPER ====================
@@ -69,6 +82,16 @@ class Consulta extends Model
         return $this->estado === 'atendida';
     }
 
+    public function isAgendada(): bool
+    {
+        return $this->estado === 'agendada';
+    }
+
+    public function isCompletada(): bool
+    {
+        return $this->estado === 'completada';
+    }
+
     public function isCancelada(): bool
     {
         return $this->estado === 'cancelada';
@@ -76,7 +99,7 @@ class Consulta extends Model
 
     public function isUrgente(): bool
     {
-        return $this->urgencia === 'alta';
+        return $this->urgencia === 'Alta' || $this->urgencia === 'alta';
     }
 
     public function requierePresencial(): bool

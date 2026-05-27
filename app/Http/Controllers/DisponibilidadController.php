@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Animal;
 use App\Models\Disponibilidad;
 use Illuminate\Http\Request;
@@ -10,6 +11,7 @@ class DisponibilidadController extends Controller
     public function index()
     {
         $disponibilidades = Disponibilidad::where('user_id', auth()->user()->id)
+            ->orderBy('fecha')
             ->orderBy('dia_semana')
             ->orderBy('hora_inicio')
             ->get();
@@ -19,18 +21,20 @@ class DisponibilidadController extends Controller
 
     public function create()
     {
-    $animales = Animal::orderBy('nombre')->get();
-    $disponibilidades = Disponibilidad::where('user_id', auth()->id())
-        ->orderBy('dia_semana')
-        ->get();
-    
-    return view('disponibilidades.create', compact('animales', 'disponibilidades'));
+        $animales = Animal::orderBy('nombre')->get();
+        $disponibilidades = Disponibilidad::where('user_id', auth()->id())
+            ->orderBy('fecha')
+            ->orderBy('dia_semana')
+            ->get();
+        
+        return view('disponibilidades.create', compact('animales', 'disponibilidades'));
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
             'especialidad' => 'required|string|max:50',
+            'fecha' => 'required|date|after:today',
             'dia_semana' => 'required|string|in:Lunes,Martes,Miércoles,Jueves,Viernes,Sábado,Domingo',
             'hora_inicio' => 'required|date_format:H:i',
             'hora_fin' => 'required|date_format:H:i|after:hora_inicio',
@@ -38,10 +42,11 @@ class DisponibilidadController extends Controller
         ]);
 
         $data['user_id'] = auth()->user()->id;
+        $data['activo'] = true;
 
         Disponibilidad::create($data);
 
-        return redirect()->route('disponibilidades.index')->with('success', 'Disponibilidad creada correctamente.');
+        return redirect()->route('profesional.consultas')->with('success', 'Disponibilidad creada correctamente.');
     }
 
     public function edit(Disponibilidad $disponibilidad)
@@ -61,6 +66,7 @@ class DisponibilidadController extends Controller
 
         $data = $request->validate([
             'especialidad' => 'required|string|max:50',
+            'fecha' => 'required|date',
             'dia_semana' => 'required|string|in:Lunes,Martes,Miércoles,Jueves,Viernes,Sábado,Domingo',
             'hora_inicio' => 'required|date_format:H:i',
             'hora_fin' => 'required|date_format:H:i|after:hora_inicio',
@@ -70,7 +76,7 @@ class DisponibilidadController extends Controller
 
         $disponibilidad->update($data);
 
-        return redirect()->route('disponibilidades.index')->with('success', 'Disponibilidad actualizada correctamente.');
+        return redirect()->route('profesional.consultas')->with('success', 'Disponibilidad actualizada correctamente.');
     }
 
     public function destroy(Disponibilidad $disponibilidad)
@@ -81,27 +87,6 @@ class DisponibilidadController extends Controller
 
         $disponibilidad->delete();
 
-        return redirect()->route('disponibilidades.index')->with('success', 'Disponibilidad eliminada correctamente.');
-    }
-
-    // Para que los productores vean doctores disponibles
-    public function buscarProfesionales(Request $request)
-    {
-        $especialidad = $request->get('especialidad');
-        $dia_semana = $request->get('dia_semana');
-
-        $query = Disponibilidad::where('activo', true);
-
-        if ($especialidad) {
-            $query->where('especialidad', $especialidad);
-        }
-
-        if ($dia_semana) {
-            $query->where('dia_semana', $dia_semana);
-        }
-
-        $disponibilidades = $query->with('user')->get();
-
-        return view('disponibilidades.buscar', compact('disponibilidades', 'especialidad', 'dia_semana'));
+        return redirect()->route('profesional.consultas')->with('success', 'Disponibilidad eliminada correctamente.');
     }
 }

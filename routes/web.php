@@ -63,19 +63,42 @@ Route::middleware('auth')->group(function () {
     Route::get('/mensajes/{mensaje}', [MensajeController::class, 'show'])->name('mensaje.show');
 
     // ========== BUSCAR PROFESIONALES (PARA PRODUCTORES Y PROFESIONALES) ==========
-    Route::get('/profesionales/buscar', [DisponibilidadController::class, 'buscarProfesionales'])->name('profesionales.buscar');
+    Route::get('/profesionales/buscar', [ConsultaController::class, 'buscarProfesionales'])->name('profesionales.buscar');
+
+    // ========== CREAR CONSULTA (disponible para PRODUCTORES) ==========
+    Route::get('/consultas/crear', [ConsultaController::class, 'create'])->name('consulta.create');
+    Route::post('/consultas', [ConsultaController::class, 'store'])->name('consulta.store');
 
     // ========== CONSULTAS Y RECETAS (disponibles para TODOS) ==========
     Route::get('/consultas/{consulta}', [ConsultaController::class, 'show'])->name('consulta.show');
     Route::get('/recetas/{receta}', [RecetaController::class, 'show'])->name('receta.show');
+
+    // ========== HISTORIALES CLÍNICOS ==========
+    // RUTAS SIN PARÁMETROS (IMPORTANTES - DEBEN IR PRIMERO)
+    Route::get('/historiales', [HistorialClinicoController::class, 'index'])->name('historial.index');
+    Route::get('/historiales/crear', [HistorialClinicoController::class, 'create'])->name('historial.create');
+    Route::post('/historiales', [HistorialClinicoController::class, 'store'])->name('historial.store');
+    
+    // RUTA DE VER (disponible para TODOS - productores y profesionales)
+    Route::get('/historiales/{historialClinico}', [HistorialClinicoController::class, 'show'])->name('historial.show');
 });
 
 // ========== RUTAS PARA PROFESIONALES (VETERINARIOS Y ESPECIALISTAS) ==========
-Route::middleware(['auth', \App\Http\Middleware\CheckProfesional::class])->group(function () {
-    // Pacientes
-    Route::get('/mis-pacientes', [DashboardController::class, 'misPacientes'])->name('profesional.pacientes');
+Route::middleware([\App\Http\Middleware\CheckProfesional::class])->group(function () {
+    
+    // ========== EDICIÓN Y ELIMINACIÓN DE HISTORIALES (solo profesionales) ==========
+    Route::get('/historiales/{historialClinico}/editar', [HistorialClinicoController::class, 'edit'])->name('historial.edit');
+    Route::put('/historiales/{historialClinico}', [HistorialClinicoController::class, 'update'])->name('historial.update');
+    Route::delete('/historiales/{historialClinico}', [HistorialClinicoController::class, 'destroy'])->name('historial.destroy');
 
-    // Disponibilidades
+    // ========== CONSULTAS ==========
+    Route::get('/consultas', [ConsultaController::class, 'index'])->name('profesional.consultas');
+    Route::post('/consultas/{consulta}/attend', [ConsultaController::class, 'attend'])->name('consulta.attend');
+    Route::get('/consultas/{consulta}/editar', [ConsultaController::class, 'edit'])->name('consulta.edit');
+    Route::put('/consultas/{consulta}', [ConsultaController::class, 'update'])->name('consulta.update');
+    Route::delete('/consultas/{consulta}', [ConsultaController::class, 'destroy'])->name('consulta.destroy');
+
+    // ========== DISPONIBILIDADES ==========
     Route::get('/disponibilidades', [DisponibilidadController::class, 'index'])->name('disponibilidades.index');
     Route::get('/disponibilidades/crear', [DisponibilidadController::class, 'create'])->name('disponibilidades.create');
     Route::post('/disponibilidades', [DisponibilidadController::class, 'store'])->name('disponibilidades.store');
@@ -83,22 +106,14 @@ Route::middleware(['auth', \App\Http\Middleware\CheckProfesional::class])->group
     Route::put('/disponibilidades/{disponibilidad}', [DisponibilidadController::class, 'update'])->name('disponibilidades.update');
     Route::delete('/disponibilidades/{disponibilidad}', [DisponibilidadController::class, 'destroy'])->name('disponibilidades.destroy');
 
-    // Consultas
-    Route::get('/consultas', [ConsultaController::class, 'index'])->name('profesional.consultas');
-    Route::get('/consultas/crear', [ConsultaController::class, 'create'])->name('consulta.create');
-    Route::post('/consultas', [ConsultaController::class, 'store'])->name('consulta.store');
-    Route::get('/consultas/{consulta}/editar', [ConsultaController::class, 'edit'])->name('consulta.edit');
-    Route::put('/consultas/{consulta}', [ConsultaController::class, 'update'])->name('consulta.update');
+    // ========== PACIENTES ==========
+    Route::get('/mis-pacientes', [DashboardController::class, 'misPacientes'])->name('profesional.pacientes');
 
-    // Recetas
+    // ========== RECETAS ==========
     Route::get('/recetas', [RecetaController::class, 'index'])->name('profesional.recetas');
     Route::get('/recetas/crear', [RecetaController::class, 'create'])->name('receta.create');
     Route::post('/recetas', [RecetaController::class, 'store'])->name('receta.store');
     Route::get('/recetas/{receta}/editar', [RecetaController::class, 'edit'])->name('receta.edit');
     Route::put('/recetas/{receta}', [RecetaController::class, 'update'])->name('receta.update');
     Route::delete('/recetas/{receta}', [RecetaController::class, 'destroy'])->name('receta.destroy');
-
-    // Historiales clínicos
-    Route::get('/historiales', [HistorialClinicoController::class, 'index'])->name('profesional.historiales');
-    Route::post('/historiales', [HistorialClinicoController::class, 'store'])->name('historial.store');
 });

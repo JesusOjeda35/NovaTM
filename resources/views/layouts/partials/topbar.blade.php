@@ -37,63 +37,93 @@
             <!-- Center navigation -->
             <div class="hidden xl:flex items-center gap-6 text-sm font-semibold" style="color: #14202A;">
                 @auth
-                    <a href="{{ route('productor.animales') }}" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
+                    <!-- Mi Ganado - Para todos -->
+                    <a href="{{ route('productor.animales') }}" 
+                       class="transition duration-300 hover:text-yellow-400" 
+                       style="color: #14202A;">
                         Mi Ganado <i class='fas fa-paw'></i>
                     </a>
 
+                    <!-- Consultas - Diferenciado por rol -->
                     @if(auth()->user()->isProfesional())
-                        <!-- Para veterinarios y especialistas -->
-                        <a href="{{ route('profesional.consultas') }}" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
+                        <a href="{{ route('profesional.consultas') }}" 
+                           class="transition duration-300 hover:text-yellow-400" 
+                           style="color: #14202A;">
                             Consultas <i class="fa-solid fa-stethoscope"></i>
                         </a>
                     @else
-                        <!-- Para productores -->
-                        <a href="{{ route('profesionales.buscar') }}" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
+                        <a href="{{ route('profesionales.buscar') }}" 
+                           class="transition duration-300 hover:text-yellow-400" 
+                           style="color: #14202A;">
                             Consultas <i class="fa-solid fa-stethoscope"></i>
                         </a>
                     @endif
 
-                    <a href="{{ route('profesional.historiales') }}" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
+                    <!-- Historial - Para todos -->
+                    <a href="{{ route('historial.index') }}" 
+                       class="transition duration-300 hover:text-yellow-400" 
+                       style="color: #14202A;">
                         Historial <i class='far fa-clipboard'></i>
                     </a>
 
+                    <!-- Recetas - Diferenciado por rol -->
                     @if(auth()->user()->isProfesional())
-                        <a href="{{ route('profesional.recetas') }}" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
+                        <a href="{{ route('profesional.recetas') }}" 
+                           class="transition duration-300 hover:text-yellow-400" 
+                           style="color: #14202A;">
                             Recetas <i class="fa-solid fa-pills"></i>
                         </a>
                     @else
-                        <a href="{{ route('productor.recetas') }}" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
+                        <a href="{{ route('productor.recetas') }}" 
+                           class="transition duration-300 hover:text-yellow-400" 
+                           style="color: #14202A;">
                             Recetas <i class="fa-solid fa-pills"></i>
                         </a>
                     @endif
 
-                    <a href="{{ route('productor.mensajes') }}" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
+                    <!-- Mensajes - Para todos -->
+                    <a href="{{ route('productor.mensajes') }}" 
+                       class="transition duration-300 hover:text-yellow-400" 
+                       style="color: #14202A;">
                         Mensajes <i class='far fa-comment'></i>
                     </a>
 
-                    <a href="{{ route('dashboard') }}" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
+                    <!-- Perfil - Para todos -->
+                    <a href="{{ route('dashboard') }}" 
+                       class="transition duration-300 hover:text-yellow-400" 
+                       style="color: #14202A;">
                         Perfil <i class='fas fa-user-alt'></i>
                     </a>
 
-                    <a href="#footer" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
+                    <!-- Ayuda - Para todos -->
+                    <a href="#footer" 
+                       class="transition duration-300 hover:text-yellow-400" 
+                       style="color: #14202A;">
                         Ayuda <i class="fa-solid fa-question"></i>
                     </a>
                 @else
-                    <a href="{{ route('login') }}" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
-                        Perfil <i class='fas fa-user-alt'></i>
+                    <!-- No autenticado -->
+                    <a href="{{ route('login') }}" 
+                       class="transition duration-300 hover:text-yellow-400" 
+                       style="color: #14202A;">
+                        Iniciar Sesión <i class='fas fa-sign-in-alt'></i>
                     </a>
-                    <a href="#footer" class="transition duration-300" style="color: #14202A;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#14202A'">
+                    <a href="#footer" 
+                       class="transition duration-300 hover:text-yellow-400" 
+                       style="color: #14202A;">
                         Ayuda <i class="fa-solid fa-question"></i>
                     </a>
                 @endauth
             </div>
 
-            <!-- Right side: Emergency + Logout (si está autenticado) -->
+            <!-- Right side: Emergency + Logout -->
             <div class="flex items-center gap-3">
                 @auth
                     <form method="POST" action="{{ route('logout') }}" style="display: inline;">
                         @csrf
-                        <button type="submit" class="text-sm font-semibold transition duration-300 px-3 py-2 rounded" style="color: #14202A;" onmouseover="this.style.color='#facc15'; this.style.backgroundColor='#f0f0f0'" onmouseout="this.style.color='#14202A'; this.style.backgroundColor='transparent'">
+                        <button type="submit" 
+                                class="text-sm font-semibold transition duration-300 px-3 py-2 rounded hover:bg-gray-100" 
+                                style="color: #14202A;">
                             <i class='fas fa-sign-out-alt'></i> Salir
                         </button>
                     </form>

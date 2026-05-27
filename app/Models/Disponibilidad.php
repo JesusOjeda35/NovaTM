@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Disponibilidad extends Model
 {
@@ -13,6 +14,7 @@ class Disponibilidad extends Model
         'user_id',
         'especialidad',
         'dia_semana',
+        'fecha',
         'hora_inicio',
         'hora_fin',
         'precio_consulta',
@@ -20,6 +22,7 @@ class Disponibilidad extends Model
     ];
 
     protected $casts = [
+        'fecha' => 'date',
         'activo' => 'boolean',
     ];
 
@@ -28,5 +31,10 @@ class Disponibilidad extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function consultas(): HasMany
+    {
+        return $this->hasMany(Consulta::class, 'disponibilidad_id', 'id');
     }
 }

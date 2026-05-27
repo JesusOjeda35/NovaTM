@@ -36,6 +36,9 @@ class User extends Authenticatable
         'estado',
         'registrado_por',
         'password_hash',
+        'municipio',
+        'departamento',
+        'nombre_ganaderia',
     ];
 
     protected $hidden = [
@@ -44,6 +47,8 @@ class User extends Authenticatable
 
     protected $casts = [
         'timestamp_registro' => 'datetime',
+        'municipio' => 'json',
+        'departamento' => 'json',
     ];
 
     /**
@@ -54,6 +59,87 @@ class User extends Authenticatable
         return 'password_hash';
     }
 
+    // ==================== ACESORES PARA UBICACIÓN ====================
+
+    /**
+     * Accesor para municipio - decodifica JSON si es necesario
+     */
+    public function getMunicipioAttribute($value)
+    {
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            return is_array($decoded) ? $decoded : $value;
+        }
+        return $value;
+    }
+
+    /**
+     * Accesor para departamento - decodifica JSON si es necesario
+     */
+    public function getDepartamentoAttribute($value)
+    {
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            return is_array($decoded) ? $decoded : $value;
+        }
+        return $value;
+    }
+
+    /**
+     * Obtiene la ubicación formateada (Municipio, Departamento)
+     * Prioriza relaciones sobre campos JSON
+     */
+    public function getUbicacionFormattedAttribute()
+    {
+        $municipioText = null;
+        $departamentoText = null;
+
+        // Primero intenta obtener de las relaciones (IDs)
+        try {
+            if ($this->municipio_id && $this->municipioRelacion) {
+                $municipioText = $this->municipioRelacion->nombre ?? null;
+            }
+            
+            if ($this->departamento_id && $this->departamentoRelacion) {
+                $departamentoText = $this->departamentoRelacion->nombre ?? null;
+            }
+        } catch (\Exception $e) {
+            // Si hay error en las relaciones, continúa con JSON
+        }
+
+        // Si no tiene datos de relaciones, intenta desde los campos JSON
+        if (!$municipioText || !$departamentoText) {
+            $municipio = $this->getAttribute('municipio');
+            $departamento = $this->getAttribute('departamento');
+            
+            // Decodificar si son strings JSON
+            if (is_string($municipio)) {
+                $municipioDecoded = json_decode($municipio, true);
+                if (is_array($municipioDecoded) && isset($municipioDecoded['nombre'])) {
+                    $municipioText = $municipioDecoded['nombre'];
+                }
+            } elseif (is_array($municipio) && isset($municipio['nombre'])) {
+                $municipioText = $municipio['nombre'];
+            }
+            
+            if (is_string($departamento)) {
+                $departamentoDecoded = json_decode($departamento, true);
+                if (is_array($departamentoDecoded) && isset($departamentoDecoded['nombre'])) {
+                    $departamentoText = $departamentoDecoded['nombre'];
+                }
+            } elseif (is_array($departamento) && isset($departamento['nombre'])) {
+                $departamentoText = $departamento['nombre'];
+            }
+        }
+
+        // Retornar ubicación formateada
+        if ($municipioText && $departamentoText) {
+            return $municipioText . ', ' . $departamentoText;
+        }
+        
+        return 'N/A';
+    }
+
     // ==================== RELACIONES DE LOCALIDAD ====================
     
     public function pais(): BelongsTo
@@ -61,12 +147,12 @@ class User extends Authenticatable
         return $this->belongsTo(Pais::class, 'pais_id', 'id');
     }
 
-    public function departamento(): BelongsTo
+    public function departamentoRelacion(): BelongsTo
     {
         return $this->belongsTo(Departamento::class, 'departamento_id', 'id');
     }
 
-    public function municipio(): BelongsTo
+    public function municipioRelacion(): BelongsTo
     {
         return $this->belongsTo(Municipio::class, 'municipio_id', 'id');
     }
@@ -141,7 +227,9 @@ class User extends Authenticatable
      */
     public function isProductor(): bool
     {
-        return $this->rol === 'productor';
+        $rol = strtolower(trim($this->rol ?? ''));
+        $rol = preg_replace('/[^a-z0-9]/', '', $rol);
+        return $rol === 'productor';
     }
 
     /**
@@ -149,7 +237,9 @@ class User extends Authenticatable
      */
     public function isVeterinario(): bool
     {
-        return $this->rol === 'veterinario';
+        $rol = strtolower(trim($this->rol ?? ''));
+        $rol = preg_replace('/[^a-z0-9]/', '', $rol);
+        return $rol === 'veterinario';
     }
 
     /**
@@ -157,7 +247,9 @@ class User extends Authenticatable
      */
     public function isEspecialista(): bool
     {
-        return $this->rol === 'especialista';
+        $rol = strtolower(trim($this->rol ?? ''));
+        $rol = preg_replace('/[^a-z0-9]/', '', $rol);
+        return $rol === 'especialista';
     }
 
     /**
@@ -165,7 +257,9 @@ class User extends Authenticatable
      */
     public function isProfesional(): bool
     {
-        return in_array($this->rol, ['veterinario', 'especialista']);
+        $rol = strtolower(trim($this->rol ?? ''));
+        $rol = preg_replace('/[^a-z0-9]/', '', $rol);
+        return in_array($rol, ['veterinario', 'especialista']);
     }
 
     /**
