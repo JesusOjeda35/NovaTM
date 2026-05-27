@@ -76,4 +76,43 @@ class EmergenciaController extends Controller
 
         return redirect()->route('emergencias.index')->with('success', 'Emergencia eliminada correctamente.');
     }
+
+    // ========== NUEVOS MÉTODOS PARA EMERGENCIA PÚBLICA ==========
+
+    public function showPublica()
+    {
+        $profesionales = User::where('rol', 'veterinario')
+                             ->orWhere('rol', 'especialista')
+                             ->where('estado', 'A')
+                             ->orderBy('nombre_completo')
+                             ->get();
+        
+        return view('emergencias.publica', compact('profesionales'));
+    }
+
+    public function storePublica(Request $request)
+    {
+        $data = $request->validate([
+            'nombre_animal' => 'required|string|max:100',
+            'especie' => 'required|string|max:50',
+            'sintomas_graves' => 'required|string|max:500',
+            'telefono_contacto' => 'required|string|max:20',
+            'email_contacto' => 'required|email|max:100',
+            'direccion_texto' => 'nullable|string|max:300',
+            'latitud' => 'nullable|numeric',
+            'longitud' => 'nullable|numeric',
+        ]);
+
+        // Crear emergencia sin usuario autenticado
+        $data['Users_id'] = null;  // Sin usuario (público)
+        $data['estado'] = 'pendiente';
+        $data['fecha_reporte'] = now();
+        $data['sincronizado'] = 'N';
+        $data['animales_id_animal'] = null;  // No hay animal registrado
+
+        Emergencias::create($data);
+
+        return redirect()->route('emergencia.publica')
+                       ->with('success', '✅ Emergencia reportada correctamente. Un profesional se contactará pronto.');
+    }
 }

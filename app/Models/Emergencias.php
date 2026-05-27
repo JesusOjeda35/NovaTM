@@ -18,6 +18,10 @@ class Emergencias extends Model
         'Users_id',
         'Users_id2',
         'animales_id_animal',
+        'nombre_animal',
+        'especie',
+        'telefono_contacto',
+        'email_contacto',
         'fecha_reporte',
         'sintomas_graves',
         'latitud',
@@ -71,5 +75,10 @@ class Emergencias extends Model
     public function tieneUbicacion(): bool
     {
         return $this->latitud !== null && $this->longitud !== null;
+    }
+
+    public function esPublica(): bool
+    {
+        return $this->Users_id === null;
     }
 }

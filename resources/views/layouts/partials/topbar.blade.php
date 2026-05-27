@@ -83,9 +83,20 @@
 
                     <!-- Mensajes - Para todos -->
                     <a href="{{ route('productor.mensajes') }}" 
-                       class="transition duration-300 hover:text-yellow-400" 
+                       class="transition duration-300 hover:text-yellow-400 relative" 
                        style="color: #14202A;">
                         Mensajes <i class='far fa-comment'></i>
+                        <!-- Notificación de mensajes sin leer -->
+                        @php
+                            $noLeidos = \App\Models\Mensajes::where('Users_id2', auth()->id())
+                                ->where('leido', 'N')
+                                ->count();
+                        @endphp
+                        @if($noLeidos > 0)
+                            <span class="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                {{ $noLeidos }}
+                            </span>
+                        @endif
                     </a>
 
                     <!-- Perfil - Para todos -->
@@ -129,8 +140,9 @@
                     </form>
                 @endauth
                 
-                <a href="#" class="bg-red-600 hover:bg-red-700 text-white text-sm font-bold px-5 py-3 rounded-md transition">
-                    <i class="fa fa-ambulance" aria-hidden="true"></i> Atención de emergencia
+                <a href="{{ route('emergencia.publica') }}" class="bg-red-600 hover:bg-red-700 text-white text-sm font-bold px-5 py-3 rounded-md transition duration-300 flex items-center gap-2">
+                    <i class="fa fa-ambulance" aria-hidden="true"></i> 
+                    <span>Emergencia</span>
                 </a>
             </div>
         </div>

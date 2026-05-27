@@ -24,6 +24,8 @@ class Mensajes extends Model
         'fecha_envio',
         'leido',
         'sincronizado',
+        'eliminado_por_emisor',
+        'eliminado_por_receptor',
     ];
 
     protected $casts = [
@@ -67,5 +69,26 @@ class Mensajes extends Model
     public function marcarComoLeido(): void
     {
         $this->update(['leido' => 'S']);
+    }
+
+    public function getHoraFormato()
+    {
+        return $this->fecha_envio->format('H:i');
+    }
+
+    public function getFechaFormato()
+    {
+        $hoy = now()->toDateString();
+        $fecha = $this->fecha_envio->toDateString();
+
+        if ($fecha === $hoy) {
+            return $this->getHoraFormato();
+        }
+
+        if ($fecha === now()->subDay()->toDateString()) {
+            return 'Ayer';
+        }
+
+        return $this->fecha_envio->format('d/m/Y');
     }
 }

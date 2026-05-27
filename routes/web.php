@@ -11,6 +11,7 @@ use App\Http\Controllers\RecetaController;
 use App\Http\Controllers\MensajeController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\DisponibilidadController;
+use App\Http\Controllers\EmergenciaController;
 
 // ========== RUTAS PÚBLICAS (sin autenticación) ==========
 Route::get('/', function () {
@@ -20,6 +21,10 @@ Route::get('/', function () {
 Route::get('/contacto', function () {
     return view('contacto');
 })->name('contacto');
+
+// ========== EMERGENCIA PÚBLICA ==========
+Route::get('/emergencia', [EmergenciaController::class, 'showPublica'])->name('emergencia.publica');
+Route::post('/emergencia', [EmergenciaController::class, 'storePublica'])->name('emergencia.publica.store');
 
 // ========== AUTENTICACIÓN ==========
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -47,7 +52,7 @@ Route::middleware('auth')->group(function () {
     // ========== MENÚ GENERAL (disponible para todos los roles autenticados) ==========
     Route::get('/mis-animales', [AnimalController::class, 'index'])->name('productor.animales');
     Route::get('/mis-consultas', [ConsultaController::class, 'misConsultas'])->name('productor.consultas');
-    Route::get('/mis-recetas', [RecetaController::class, 'misRecetas'])->name('productor.recetas');
+    Route::get('/mis-recetas', [RecetaController::class, 'indexProductor'])->name('productor.recetas');
     Route::get('/mensajes', [MensajeController::class, 'index'])->name('productor.mensajes');
 
     // ========== RUTAS PARA ANIMALES (disponibles para TODOS los usuarios autenticados) ==========
@@ -59,8 +64,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/animales/{animal}', [AnimalController::class, 'destroy'])->name('animal.destroy');
 
     // ========== RUTAS PARA MENSAJES (disponibles para TODOS) ==========
+    Route::get('/mensajes/nuevo', [MensajeController::class, 'create'])->name('mensaje.create');
     Route::post('/mensajes', [MensajeController::class, 'store'])->name('mensaje.store');
-    Route::get('/mensajes/{mensaje}', [MensajeController::class, 'show'])->name('mensaje.show');
+    Route::get('/mensajes/chat/{usuarioId}', [MensajeController::class, 'show'])->name('mensaje.show');
+    Route::delete('/mensajes/{mensajeId}', [MensajeController::class, 'destroy'])->name('mensaje.destroy');
 
     // ========== BUSCAR PROFESIONALES (PARA PRODUCTORES Y PROFESIONALES) ==========
     Route::get('/profesionales/buscar', [ConsultaController::class, 'buscarProfesionales'])->name('profesionales.buscar');
@@ -71,7 +78,8 @@ Route::middleware('auth')->group(function () {
 
     // ========== CONSULTAS Y RECETAS (disponibles para TODOS) ==========
     Route::get('/consultas/{consulta}', [ConsultaController::class, 'show'])->name('consulta.show');
-    Route::get('/recetas/{receta}', [RecetaController::class, 'show'])->name('receta.show');
+    Route::get('/recetas/{receta}/pdf', [RecetaController::class, 'downloadPDF'])->name('recetas.pdf');
+    Route::get('/recetas/ver/{receta}', [RecetaController::class, 'showProductor'])->name('productor.recetas.show');
 
     // ========== HISTORIALES CLÍNICOS ==========
     // IMPORTANTE: Las rutas sin parámetros DEBEN ir ANTES que las parametrizadas
@@ -106,12 +114,13 @@ Route::middleware('auth')->group(function () {
         // ========== PACIENTES ==========
         Route::get('/mis-pacientes', [DashboardController::class, 'misPacientes'])->name('profesional.pacientes');
 
-        // ========== RECETAS ==========
-        Route::get('/recetas', [RecetaController::class, 'index'])->name('profesional.recetas');
-        Route::get('/recetas/crear', [RecetaController::class, 'create'])->name('receta.create');
-        Route::post('/recetas', [RecetaController::class, 'store'])->name('receta.store');
-        Route::get('/recetas/{receta}/editar', [RecetaController::class, 'edit'])->name('receta.edit');
-        Route::put('/recetas/{receta}', [RecetaController::class, 'update'])->name('receta.update');
-        Route::delete('/recetas/{receta}', [RecetaController::class, 'destroy'])->name('receta.destroy');
+        // ========== RECETAS - PROFESIONAL ==========
+        Route::get('/recetas', [RecetaController::class, 'indexProfesional'])->name('profesional.recetas');
+        Route::get('/recetas/crear', [RecetaController::class, 'create'])->name('profesional.recetas.create');
+        Route::post('/recetas', [RecetaController::class, 'store'])->name('profesional.recetas.store');
+        Route::get('/recetas/{receta}/ver', [RecetaController::class, 'showProfesional'])->name('profesional.recetas.show');
+        Route::get('/recetas/{receta}/editar', [RecetaController::class, 'edit'])->name('profesional.recetas.edit');
+        Route::put('/recetas/{receta}', [RecetaController::class, 'update'])->name('profesional.recetas.update');
+        Route::delete('/recetas/{receta}', [RecetaController::class, 'destroy'])->name('profesional.recetas.destroy');
     });
 });

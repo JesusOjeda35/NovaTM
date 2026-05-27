@@ -15,11 +15,14 @@ class Receta extends Model
     protected $keyType = 'int';
 
     protected $fillable = [
-        'Users_id',
+        'user_id',
         'animales_id_animal',
         'consultas_id_consulta',
         'fecha_emision',
         'fecha_vencimiento',
+        'diagnostico',
+        'indicaciones_generales',
+        'notas_adicionales',
         'firma_electronica',
         'estado',
         'sincronizado',
@@ -34,7 +37,7 @@ class Receta extends Model
 
     public function User(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'Users_id', 'id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     public function animal(): BelongsTo
