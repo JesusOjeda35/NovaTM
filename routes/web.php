@@ -83,15 +83,15 @@ Route::middleware('auth')->group(function () {
 
     // ========== HISTORIALES CLÍNICOS ==========
     // IMPORTANTE: Las rutas sin parámetros DEBEN ir ANTES que las parametrizadas
+    // CORREGIDO: Se cambió {historialClinico} por {id} para que coincida con el controlador.
     Route::get('/historiales', [HistorialClinicoController::class, 'index'])->name('historial.index');
     Route::get('/historiales/crear', [HistorialClinicoController::class, 'create'])->name('historial.create');
     Route::post('/historiales', [HistorialClinicoController::class, 'store'])->name('historial.store');
-    
-    // Rutas parametrizadas (van DESPUÉS)
-    Route::get('/historiales/{historialClinico}', [HistorialClinicoController::class, 'show'])->name('historial.show');
-    Route::get('/historiales/{historialClinico}/editar', [HistorialClinicoController::class, 'edit'])->name('historial.edit');
-    Route::put('/historiales/{historialClinico}', [HistorialClinicoController::class, 'update'])->name('historial.update');
-    Route::delete('/historiales/{historialClinico}', [HistorialClinicoController::class, 'destroy'])->name('historial.destroy');
+
+    Route::get('/historiales/{id}', [HistorialClinicoController::class, 'show'])->name('historial.show');
+    Route::get('/historiales/{id}/editar', [HistorialClinicoController::class, 'edit'])->name('historial.edit');
+    Route::put('/historiales/{id}', [HistorialClinicoController::class, 'update'])->name('historial.update');
+    Route::delete('/historiales/{id}', [HistorialClinicoController::class, 'destroy'])->name('historial.destroy');
 
     // ========== RUTAS PARA PROFESIONALES (VETERINARIOS Y ESPECIALISTAS) ==========
     Route::middleware(\App\Http\Middleware\CheckProfesional::class)->group(function () {

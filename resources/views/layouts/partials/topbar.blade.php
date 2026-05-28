@@ -2,149 +2,142 @@
     <div class="w-full px-4 lg:px-8">
         <div class="flex items-center justify-between py-4">
 
-            <!-- Left side: Logo + User (si está autenticado) -->
+            {{-- LADO IZQUIERDO: LOGO + USUARIO --}}
             <div class="flex items-center gap-3 min-w-[220px]">
-                <a href="{{ route('home') }}" style="text-decoration: none; display: flex; align-items: center; gap: 12px; transition: opacity 0.3s ease;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
-                    <img src="{{ asset('images/logoNovaTM.png') }}" alt="NovaTM" class="w-14 h-14 object-contain">
+                <a href="{{ route('home') }}"
+                   style="text-decoration: none; display: flex; align-items: center; gap: 12px; transition: opacity 0.3s ease;"
+                   onmouseover="this.style.opacity='0.8'"
+                   onmouseout="this.style.opacity='1'">
+
+                    <img src="{{ asset('images/logoNovaTM.png') }}"
+                         alt="NovaTM"
+                         class="w-14 h-14 object-contain">
+
                     <div>
-                        <span class="text-2xl font-bold tracking-tight block" style="color: #14202A; line-height: 1.2;">
+                        <span class="text-2xl font-bold tracking-tight block"
+                              style="color: #14202A; line-height: 1.2;">
                             NovaTM
                         </span>
-                        <span class="text-xs text-gray-500" style="letter-spacing: 0.5px;">Telemedicina</span>
+                        <span class="text-xs text-gray-500" style="letter-spacing: 0.5px;">
+                            Telemedicina
+                        </span>
                     </div>
                 </a>
-                
-                <!-- Nombre del User autenticado -->
+
                 @auth
                     <div class="ml-6 pl-6 border-l-2 border-gray-300">
                         <span class="text-sm font-semibold" style="color: #14202A;">
-                            {{ explode(' ', auth()->user()->nombre_completo)[0] }} 
+                            {{ explode(' ', auth()->user()->nombre_completo)[0] ?? auth()->user()->name ?? 'Usuario' }}
                             {{ explode(' ', auth()->user()->nombre_completo)[1] ?? '' }}
                         </span>
-                        <p class="text-xs text-gray-500">
+
+                        <p class="text-xs text-gray-500 mb-0">
                             @if(auth()->user()->rol === 'productor')
                                 Productor
                             @elseif(auth()->user()->rol === 'veterinario')
                                 Veterinario
                             @elseif(auth()->user()->rol === 'especialista')
                                 Especialista
+                            @else
+                                Usuario
                             @endif
                         </p>
                     </div>
                 @endauth
             </div>
 
-            <!-- Center navigation -->
+            {{-- NAVEGACIÓN CENTRAL --}}
             <div class="hidden xl:flex items-center gap-6 text-sm font-semibold" style="color: #14202A;">
                 @auth
-                    <!-- Mi Ganado - Para todos -->
-                    <a href="{{ route('productor.animales') }}" 
-                       class="transition duration-300 hover:text-yellow-400" 
-                       style="color: #14202A;">
-                        Mi Ganado <i class='fas fa-paw'></i>
+                    <a href="{{ route('productor.animales') }}"
+                       class="transition duration-300 hover:text-yellow-400"
+                       style="color: #14202A; text-decoration: none;">
+                        Mi Ganado <i class="fas fa-paw"></i>
                     </a>
 
-                    <!-- Consultas - Diferenciado por rol -->
                     @if(auth()->user()->isProfesional())
-                        <a href="{{ route('profesional.consultas') }}" 
-                           class="transition duration-300 hover:text-yellow-400" 
-                           style="color: #14202A;">
+                        <a href="{{ route('profesional.consultas') }}"
+                           class="transition duration-300 hover:text-yellow-400"
+                           style="color: #14202A; text-decoration: none;">
                             Consultas <i class="fa-solid fa-stethoscope"></i>
                         </a>
                     @else
-                        <a href="{{ route('profesionales.buscar') }}" 
-                           class="transition duration-300 hover:text-yellow-400" 
-                           style="color: #14202A;">
+                        <a href="{{ route('profesionales.buscar') }}"
+                           class="transition duration-300 hover:text-yellow-400"
+                           style="color: #14202A; text-decoration: none;">
                             Consultas <i class="fa-solid fa-stethoscope"></i>
                         </a>
                     @endif
 
-                    <!-- Historial - Para todos -->
-                    <a href="{{ route('historial.index') }}" 
-                       class="transition duration-300 hover:text-yellow-400" 
-                       style="color: #14202A;">
-                        Historial <i class='far fa-clipboard'></i>
+                    <a href="{{ route('historial.index') }}"
+                       class="transition duration-300 hover:text-yellow-400"
+                       style="color: #14202A; text-decoration: none;">
+                        Historial <i class="far fa-clipboard"></i>
                     </a>
 
-                    <!-- Recetas - Diferenciado por rol -->
                     @if(auth()->user()->isProfesional())
-                        <a href="{{ route('profesional.recetas') }}" 
-                           class="transition duration-300 hover:text-yellow-400" 
-                           style="color: #14202A;">
+                        <a href="{{ route('profesional.recetas') }}"
+                           class="transition duration-300 hover:text-yellow-400"
+                           style="color: #14202A; text-decoration: none;">
                             Recetas <i class="fa-solid fa-pills"></i>
                         </a>
                     @else
-                        <a href="{{ route('productor.recetas') }}" 
-                           class="transition duration-300 hover:text-yellow-400" 
-                           style="color: #14202A;">
+                        <a href="{{ route('productor.recetas') }}"
+                           class="transition duration-300 hover:text-yellow-400"
+                           style="color: #14202A; text-decoration: none;">
                             Recetas <i class="fa-solid fa-pills"></i>
                         </a>
                     @endif
 
-                    <!-- Mensajes - Para todos -->
-                    <a href="{{ route('productor.mensajes') }}" 
-                       class="transition duration-300 hover:text-yellow-400 relative" 
-                       style="color: #14202A;">
-                        Mensajes <i class='far fa-comment'></i>
-                        <!-- Notificación de mensajes sin leer -->
-                        @php
-                            $noLeidos = \App\Models\Mensajes::where('Users_id2', auth()->id())
-                                ->where('leido', 'N')
-                                ->count();
-                        @endphp
-                        @if($noLeidos > 0)
-                            <span class="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                                {{ $noLeidos }}
-                            </span>
-                        @endif
+                    <a href="{{ route('productor.mensajes') }}"
+                       class="transition duration-300 hover:text-yellow-400"
+                       style="color: #14202A; text-decoration: none;">
+                        Mensajes <i class="far fa-comment"></i>
                     </a>
 
-                    <!-- Perfil - Para todos -->
-                    <a href="{{ route('dashboard') }}" 
-                       class="transition duration-300 hover:text-yellow-400" 
-                       style="color: #14202A;">
-                        Perfil <i class='fas fa-user-alt'></i>
-                    </a>
-
-                    <!-- Ayuda - Para todos -->
-                    <a href="#footer" 
-                       class="transition duration-300 hover:text-yellow-400" 
-                       style="color: #14202A;">
-                        Ayuda <i class="fa-solid fa-question"></i>
-                    </a>
-                @else
-                    <!-- No autenticado -->
-                    <a href="{{ route('login') }}" 
-                       class="transition duration-300 hover:text-yellow-400" 
-                       style="color: #14202A;">
-                        Iniciar Sesión <i class='fas fa-sign-in-alt'></i>
-                    </a>
-                    <a href="#footer" 
-                       class="transition duration-300 hover:text-yellow-400" 
-                       style="color: #14202A;">
-                        Ayuda <i class="fa-solid fa-question"></i>
+                    {{-- AYUDA: baja al footer --}}
+                    <a href="#footer"
+                       class="transition duration-300 hover:text-yellow-400"
+                       style="color: #14202A; text-decoration: none;">
+                        Ayuda ?
                     </a>
                 @endauth
+
+                @guest
+                    <a href="{{ route('login') }}"
+                       class="transition duration-300 hover:text-yellow-400"
+                       style="color: #14202A; text-decoration: none;">
+                        Iniciar sesión
+                    </a>
+
+                    <a href="{{ route('register') }}"
+                       class="transition duration-300 hover:text-yellow-400"
+                       style="color: #14202A; text-decoration: none;">
+                        Registrarse
+                    </a>
+                @endguest
             </div>
 
-            <!-- Right side: Emergency + Logout -->
-            <div class="flex items-center gap-3">
+            {{-- LADO DERECHO --}}
+            <div class="flex items-center gap-4">
                 @auth
-                    <form method="POST" action="{{ route('logout') }}" style="display: inline;">
+                    <form action="{{ route('logout') }}" method="POST" class="m-0">
                         @csrf
-                        <button type="submit" 
-                                class="text-sm font-semibold transition duration-300 px-3 py-2 rounded hover:bg-gray-100" 
+                        <button type="submit"
+                                class="text-sm font-semibold transition duration-300 hover:text-red-600"
                                 style="color: #14202A;">
-                            <i class='fas fa-sign-out-alt'></i> Salir
+                            <i class="fas fa-sign-out-alt"></i> Salir
                         </button>
                     </form>
                 @endauth
-                
-                <a href="{{ route('emergencia.publica') }}" class="bg-red-600 hover:bg-red-700 text-white text-sm font-bold px-5 py-3 rounded-md transition duration-300 flex items-center gap-2">
-                    <i class="fa fa-ambulance" aria-hidden="true"></i> 
-                    <span>Emergencia</span>
+
+                <a href="{{ route('emergencia.publica') }}"
+                   class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded transition"
+                   style="text-decoration: none;">
+                    <i class="fas fa-ambulance"></i> Emergencia
                 </a>
             </div>
+
         </div>
     </div>
 </nav>

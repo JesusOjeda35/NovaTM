@@ -110,16 +110,20 @@
                                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition">
                                 👁️ Ver Completo
                             </a>
-                            @if(auth()->user()->isProfesional() && $historial->user_id === auth()->user()->id)
+                            
+                            {{-- SOLO LOS PROFESIONALES VEN ESTOS BOTONES --}}
+                            @if(auth()->user()->isProfesional() && $historial->user_id === auth()->id())
                                 <a href="{{ route('historial.edit', $historial->id_historial) }}" 
                                    class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded transition">
                                     ✏️ Editar
                                 </a>
-                                <form action="{{ route('historial.destroy', $historial->id_historial) }}" method="POST" style="display:inline;">
+                                <form action="{{ route('historial.destroy', $historial->id_historial) }}" 
+                                      method="POST" 
+                                      style="display: inline;"
+                                      onsubmit="return confirm(`¿Estás seguro de que deseas eliminar este historial?\n\nAnimal: {{ $historial->animal->nombre }}\nFecha: {{ $historial->fecha->format('d/m/Y H:i') }}\n\nEsta acción no se puede deshacer.`);">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition"
-                                        onclick="return confirm('¿Estás seguro?')">
+                                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition">
                                         🗑️ Eliminar
                                     </button>
                                 </form>
@@ -138,17 +142,14 @@
         @endif
     </div>
 
-    <!-- SECCIÓN 2: CITAS SIN HISTORIAL (solo para profesionales - al final) -->
+    <!-- SECCIÓN 2: CITAS SIN HISTORIAL (solo para profesionales) -->
     @if(auth()->user()->isProfesional())
         @php
-            $disponibilidadesIds = \App\Models\Disponibilidad::where('user_id', auth()->user()->id)->pluck('id')->toArray();
-            $consultasSinHistorial = \App\Models\Consulta::with('animal', 'User', 'disponibilidad')
-                ->whereIn('disponibilidad_id', $disponibilidadesIds)
+            $consultasSinHistorial = \App\Models\Consulta::where('user_id', auth()->user()->id)
                 ->where('estado', 'agendada')
-                ->get()
-                ->filter(function($consulta) {
-                    return !$consulta->historial;
-                });
+                ->whereNull('historial_id')
+                ->with('animal', 'User', 'disponibilidad')
+                ->get();
         @endphp
 
         @if($consultasSinHistorial->count() > 0)
